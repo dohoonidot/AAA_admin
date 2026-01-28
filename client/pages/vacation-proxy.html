@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>휴가 대리결제 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/vacation-admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown active">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item active" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                        <a href="vacation-approval-history.html" class="sidebar-dropdown-item">휴가신청승인 관리</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1>휴가 대리결제</h1>
+                <p class="subtitle">승인자 부재 시 휴가 신청을 대리 승인할 수 있습니다</p>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-card">
+                    <div class="filter-group">
+                        <label>상태</label>
+                        <select id="status-filter" class="filter-select">
+                            <option value="">전체</option>
+                            <option value="pending">대기중</option>
+                            <option value="approved">승인됨</option>
+                            <option value="rejected">반려됨</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>부서</label>
+                        <select id="department-filter" class="filter-select">
+                            <option value="">전체</option>
+                        </select>
+                    </div>
+                    <button id="refresh-btn" class="refresh-btn">새로고침</button>
+                </div>
+            </div>
+
+            <div class="requests-container" id="proxy-requests">
+                <!-- 대리결제 요청 카드들 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 승인/반려 모달 -->
+    <div id="action-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">대리 승인</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+                <textarea id="reason-input" placeholder="승인/반려 사유" rows="3" style="width: 100%; margin-top: 10px;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+                <button id="confirm-btn" class="modal-btn confirm">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+            loadProxyRequests();
+        });
+
+        function loadProxyRequests() {
+            const container = document.getElementById('proxy-requests');
+            // 임시 데이터
+            const data = [
+                {name: '김철수', dept: '경영관리실', type: '연차', dates: '2024-12-10 ~ 12-12', days: 3, reason: '개인사유', approver: '이부장'},
+                {name: '박영희', dept: 'New Tech사업부', type: '반차', dates: '2024-12-15', days: 0.5, reason: '병원 진료', approver: '최실장'}
+            ];
+
+            container.innerHTML = data.map(item => `
+                <div class="request-card">
+                    <div class="card-header">
+                        <div class="user-info-card">
+                            <div class="avatar">${item.name[0]}</div>
+                            <div class="user-details">
+                                <h3>${item.name}</h3>
+                                <span class="department">${item.dept}</span>
+                            </div>
+                        </div>
+                        <div class="status-badge pending">대기중</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="vacation-info">
+                            <div class="info-row"><span class="label">휴가 유형</span><span class="value">${item.type}</span></div>
+                            <div class="info-row"><span class="label">기간</span><span class="value">${item.dates} (${item.days}일)</span></div>
+                            <div class="info-row"><span class="label">사유</span><span class="value">${item.reason}</span></div>
+                            <div class="info-row"><span class="label">원 승인자</span><span class="value">${item.approver}</span></div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn reject" onclick="proxyAction('reject')">반려</button>
+                        <button class="action-btn approve" onclick="proxyAction('approve')">대리 승인</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function proxyAction(action) {
+            alert(action === 'approve' ? '대리 승인되었습니다.' : '반려되었습니다.');
+        }
+
+        function closeModal() {
+            document.getElementById('action-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

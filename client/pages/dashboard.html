@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대시보드 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/sort-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab active">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                    </div>
+                </div>
+                <!-- <a href="reports.html" class="sidebar-tab">보고서</a> -->
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h2>대시보드</h2>
+                <div class="period-filter">
+                    <label for="start-date">시작일:</label>
+                    <input type="date" id="start-date" name="start-date">
+                    <label for="end-date">종료일:</label>
+                    <input type="date" id="end-date" name="end-date">
+                    <button id="apply-filter" class="filter-button">적용</button>
+                    <button id="reset-filter" class="filter-button">초기화</button>
+                </div>
+            </div>
+            
+            <div class="dashboard-cards">
+                <div class="dashboard-card">
+                    <h3>전체 대화량</h3>
+                    <p id="total-messages" class="card-value">0</p>
+                    <!-- <span class="card-trend positive">+5% 증가</span> -->
+                    <small class="card-description">사용자 질문 + AI 응답</small>
+                </div>
+                <div class="dashboard-card">
+                    <h3>활성 사용자 수</h3>
+                    <p id="total-users" class="card-value">0</p>
+                    <!-- <span class="card-trend positive">+2% 증가</span> -->
+                    <small class="card-description">실제 질문한 사용자</small>
+                </div>
+                <div class="dashboard-card">
+                    <h3>오늘 접속자 수</h3>
+                    <div class="card-value-group">
+                        <p id="today-users" class="card-value">0</p>
+                        <div class="card-secondary-info">
+                            <small>오늘의 대화: <span id="today-conversations" class="secondary-value">0</span></small>
+                        </div>
+                    </div>
+                    <small class="card-description">오늘 로그인한 사용자 / 대화 수</small>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="chart-container category-questions-chart">
+                    <h3>카테고리별 질문 횟수</h3>
+                    <canvas id="categoryQuestionsChart"></canvas>
+                </div>
+                <div class="chart-container age-group-usage-chart">
+                    <h3>연령별 사용량</h3>
+                    <div class="chart-buttons">
+                        <button id="ageUsageBtn" class="chart-button active">총 사용량</button>
+                        <button id="ageAverageUsageBtn" class="chart-button">평균 사용량</button>
+                        <button id="ageUsageRateBtn" class="chart-button">사용률</button>
+                    </div>
+                    <canvas id="ageGroupUsageChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- 사용자별 채팅 테이블 - 전체 너비 사용 -->
+            <div class="user-chat-grid-item">
+                <div class="chart-container user-chat-table">
+                    <div class="table-header">
+                        <h3>👥 사용자별 채팅 횟수</h3>
+                        <div class="table-info">
+                            <span id="tablePageInfo" class="page-info">1-30 / 0명</span>
+                            <div class="table-controls">
+                                <select id="departmentFilter" class="department-filter">
+                                    <option value="all">전체 부서</option>
+                                    <option value="경영관리실">경영관리실</option>
+                                    <option value="New Tech사업부">New Tech사업부</option>
+                                    <option value="솔루션사업부">솔루션사업부</option>
+                                    <option value="FCM사업부">FCM사업부</option>
+                                    <option value="SCM사업부">SCM사업부</option>
+                                    <option value="Innovation Center">Innovation Center</option>
+                                    <option value="Biz AI사업부">Biz AI사업부</option>
+                                    <option value="HRS사업부">HRS사업부</option>
+                                    <option value="DTE본부">DTE본부</option>
+                                    <option value="남부지사">남부지사</option>
+                                    <option value="중국지사">중국지사</option>
+                                    <option value="PUBLIC CLOUD사업부">PUBLIC CLOUD사업부</option>
+                                    <option value="ITS사업부">ITS사업부</option>
+                                    <option value="BAC사업부">BAC사업부</option>
+                                    <option value="BDS사업부">BDS사업부</option>
+                                    <option value="NGE본부">NGE본부</option>
+                                    <option value="대표이사">대표이사</option>
+                                </select>
+                                <select id="itemsPerPage" class="items-per-page">
+                                    <option value="15">15개씩</option>
+                                    <option value="30" selected>30개씩</option>
+                                    <option value="50">50개씩</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="userChatTable" class="user-chat-data-table">
+                            <thead>
+                                <tr>
+                                    <th>순위</th>
+                                    <th>사용자명</th>
+                                    <th>부서</th>
+                                    <th>채팅 횟수</th>
+                                    <th>비율</th>
+                                    <th>최근 활동</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userChatTableBody">
+                                <!-- JavaScript로 동적 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            <span id="paginationInfo">총 0명</span>
+                        </div>
+                        <div class="pagination-controls" id="paginationControls">
+                            <button id="firstPage" class="pagination-btn">≪</button>
+                            <button id="prevPage" class="pagination-btn">‹</button>
+                            <div class="page-numbers" id="pageNumbers"></div>
+                            <button id="nextPage" class="pagination-btn">›</button>
+                            <button id="lastPage" class="pagination-btn">≫</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        // 페이지 로드 시 권한별 메뉴 제어
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+        });
+    </script>
+</body>
+</html> 

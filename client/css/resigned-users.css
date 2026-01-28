@@ -1,0 +1,234 @@
+/* 퇴사자 관리 페이지 전용 스타일 */
+
+.page-header-info {
+    margin-bottom: 20px;
+}
+
+.page-header-info h2 {
+    font-size: 1.8rem;
+    color: #1a1f36;
+    margin-bottom: 8px;
+}
+
+.page-description {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+/* 휴가 이력 버튼 스타일 */
+.view-vacation-btn {
+    padding: 6px 12px;
+    background-color: #3182F6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
+}
+
+.view-vacation-btn:hover {
+    background-color: #2563eb;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: #1a1f36;
+    margin: 0;
+}
+
+.close-modal {
+    font-size: 28px;
+    font-weight: bold;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #374151;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+}
+
+.info-row .label {
+    font-weight: 600;
+    color: #374151;
+    margin-right: 10px;
+}
+
+.info-row .value {
+    color: #6b7280;
+}
+
+/* 휴가 이력 테이블 */
+.vacation-history-table {
+    margin-top: 20px;
+}
+
+.vacation-history-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vacation-history-table thead {
+    background-color: #f9fafb;
+}
+
+.vacation-history-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.vacation-history-table td {
+    padding: 12px;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.vacation-history-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* 퇴사일 칼럼 강조 */
+#users-table td:nth-child(6) {
+    font-weight: 600;
+    color: #dc2626;
+}
+
+/* 상세정보 모달 스타일 */
+.detail-section {
+    margin-bottom: 24px;
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.detail-section h3 {
+    font-size: 1.1rem;
+    color: #1f2937;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3182F6;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.info-grid .info-row {
+    margin-bottom: 0;
+}
+
+.info-grid .label {
+    min-width: 100px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.info-grid .value {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+/* 테이블 행 호버 효과 */
+#users-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+#users-table tbody tr:hover {
+    background-color: #f0f7ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(49, 130, 246, 0.1);
+}
+
+/* 재직자로 복귀 버튼 스타일 */
+.modal-actions {
+    margin-top: 24px;
+    padding: 20px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    background-color: #f9fafb;
+    border-radius: 0 0 12px 12px;
+}
+
+.btn-restore {
+    padding: 10px 20px;
+    background-color: #10b981 !important;
+    color: white !important;
+    border: 1px solid #10b981 !important;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    display: inline-block !important;
+    visibility: visible !important;
+}
+
+.btn-restore:hover:not(:disabled) {
+    background-color: #059669;
+    border-color: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.btn-restore:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-restore:disabled {
+    background-color: #9ca3af;
+    border-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}

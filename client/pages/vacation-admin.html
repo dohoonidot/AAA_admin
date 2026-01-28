@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>휴가 부여 관리 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/vacation-admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown active">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <div class="header-content">
+                    <div class="title-section">
+                        <h1>휴가 부여 관리</h1>
+                        <p class="subtitle">특별 사유로 인한 휴가 부여 요청을 검토하고 처리합니다</p>
+                    </div>
+                    <div class="tab-container">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="requests">부여 요청 목록</button>
+                            <button class="tab-btn" data-tab="history">부여 내역</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 부여 요청 목록 탭 -->
+            <div id="requests-tab" class="tab-content active">
+                <div class="filter-section">
+                    <div class="filter-card">
+                        <div class="filter-group">
+                            <label>부서</label>
+                            <select id="department-filter" class="filter-select">
+                                <option value="">전체 부서</option>
+                                <option value="경영관리실">경영관리실</option>
+                                <option value="New Tech사업부">New Tech사업부</option>
+                                <option value="솔루션사업부">솔루션사업부</option>
+                                <option value="FCM사업부">FCM사업부</option>
+                                <option value="SCM사업부">SCM사업부</option>
+                                <option value="Innovation Center">Innovation Center</option>
+                                <option value="Biz AI사업부">Biz AI사업부</option>
+                                <option value="HRS사업부">HRS사업부</option>
+                                <option value="DTE본부">DTE본부</option>
+                                <option value="PUBLIC CLOUD사업부">PUBLIC CLOUD사업부</option>
+                                <option value="ITS사업부">ITS사업부</option>
+                                <option value="BAC사업부">BAC사업부</option>
+                                <option value="NGE본부">NGE본부</option>
+                                <option value="BDS사업부">BDS사업부</option>
+                                <option value="남부지사">남부지사</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>휴가 유형</label>
+                            <select id="type-filter" class="filter-select">
+                                <option value="">전체</option>
+                                <!-- 동적으로 생성됨 -->
+                            </select>
+                        </div>
+                        <button id="refresh-btn" class="refresh-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                <path d="M21 3v5h-5"/>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                                <path d="M3 21v-5h5"/>
+                            </svg>
+                            새로고침
+                        </button>
+                    </div>
+                </div>
+
+                <div class="requests-container">
+                    <!-- 샘플 요청 카드들 -->
+                    <div class="request-card" data-id="1" data-status="pending" data-department="dev" data-type="sick">
+                        <div class="card-header">
+                            <div class="user-info-card">
+                                <div class="avatar">김</div>
+                                <div class="user-details">
+                                    <h3>김철수</h3>
+                                    <span class="department">개발팀</span>
+                                </div>
+                            </div>
+                            <div class="status-badge pending">검토 대기</div>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="vacation-info">
+                                <div class="info-row">
+                                    <span class="label">휴가 유형</span>
+                                    <span class="value">병가</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청 기간</span>
+                                    <span class="value">2024.03.15 ~ 2024.03.17 (3일)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청 사유</span>
+                                    <span class="value">급성 장염으로 인한 입원 치료</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청일</span>
+                                    <span class="value">2024.03.14</span>
+                                </div>
+                            </div>
+
+                            <div class="attachment-section">
+                                <div class="attachment-header">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.49"/>
+                                    </svg>
+                                    첨부파일 (2개)
+                                </div>
+                                <div class="attachment-list">
+                                    <div class="attachment-item">
+                                        <span class="file-name">진단서.pdf</span>
+                                        <button class="view-btn" onclick="viewAttachment('진단서.pdf')">보기</button>
+                                    </div>
+                                    <div class="attachment-item">
+                                        <span class="file-name">입원확인서.jpg</span>
+                                        <button class="view-btn" onclick="viewAttachment('입원확인서.jpg')">보기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="action-btn reject" onclick="rejectRequest(1)">반려</button>
+                            <button class="action-btn approve" onclick="approveRequest(1)">휴가 부여</button>
+                        </div>
+                    </div>
+
+                    <div class="request-card" data-id="2" data-status="pending" data-department="design" data-type="family">
+                        <div class="card-header">
+                            <div class="user-info-card">
+                                <div class="avatar">이</div>
+                                <div class="user-details">
+                                    <h3>이영희</h3>
+                                    <span class="department">디자인팀</span>
+                                </div>
+                            </div>
+                            <div class="status-badge pending">검토 대기</div>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="vacation-info">
+                                <div class="info-row">
+                                    <span class="label">휴가 유형</span>
+                                    <span class="value">경조사</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청 기간</span>
+                                    <span class="value">2024.03.20 ~ 2024.03.22 (3일)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청 사유</span>
+                                    <span class="value">조부 상중으로 인한 장례 참석</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청일</span>
+                                    <span class="value">2024.03.19</span>
+                                </div>
+                            </div>
+
+                            <div class="attachment-section">
+                                <div class="attachment-header">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.49"/>
+                                    </svg>
+                                    첨부파일 (1개)
+                                </div>
+                                <div class="attachment-list">
+                                    <div class="attachment-item">
+                                        <span class="file-name">부고장.pdf</span>
+                                        <button class="view-btn" onclick="viewAttachment('부고장.pdf')">보기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="action-btn reject" onclick="rejectRequest(2)">반려</button>
+                            <button class="action-btn approve" onclick="approveRequest(2)">휴가 부여</button>
+                        </div>
+                    </div>
+
+                    <div class="request-card" data-id="3" data-status="approved" data-department="marketing" data-type="emergency">
+                        <div class="card-header">
+                            <div class="user-info-card">
+                                <div class="avatar">박</div>
+                                <div class="user-details">
+                                    <h3>박민수</h3>
+                                    <span class="department">마케팅팀</span>
+                                </div>
+                            </div>
+                            <div class="status-badge approved">부여 완료</div>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="vacation-info">
+                                <div class="info-row">
+                                    <span class="label">휴가 유형</span>
+                                    <span class="value">긴급 사유</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청 기간</span>
+                                    <span class="value">2024.03.10 ~ 2024.03.12 (3일)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">신청 사유</span>
+                                    <span class="value">가족 응급상황으로 인한 간병</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">처리일</span>
+                                    <span class="value">2024.03.09</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <span class="processed-info">관리자가 휴가를 부여했습니다</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 부여 내역 탭 -->
+            <div id="history-tab" class="tab-content">
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-content">
+                                <h3>전체 요청</h3>
+                                <p class="stat-number" id="total-requests">0</p>
+                                <span class="stat-change">총 요청 건수</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-content">
+                                <h3>대기중</h3>
+                                <p class="stat-number" id="requested-count">0</p>
+                                <span class="stat-change">처리 대기중</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <h3>승인됨</h3>
+                                <p class="stat-number" id="approved-count">0</p>
+                                <span class="stat-change">승인 완료</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">❌</div>
+                            <div class="stat-content">
+                                <h3>거부됨</h3>
+                                <p class="stat-number" id="rejected-count">0</p>
+                                <span class="stat-change">거부 완료</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>신청자</th>
+                                <th>부서</th>
+                                <th>휴가 유형</th>
+                                <th>기간</th>
+                                <th>일수</th>
+                                <th>신청일</th>
+                                <th>처리일</th>
+                                <th>상태</th>
+                                <th>처리자</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- API 데이터로 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 페이지네이션 -->
+                <div class="pagination-container" id="history-pagination" style="display: none;">
+                    <button id="prev-page-btn" class="pagination-btn" onclick="changeHistoryPage(-1)">이전</button>
+                    <span id="page-info" class="page-info">1 / 1</span>
+                    <button id="next-page-btn" class="pagination-btn" onclick="changeHistoryPage(1)">다음</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 처리 확인 모달 -->
+    <div id="action-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">휴가 부여</h3>
+                <button class="close-btn" onclick="closeModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-user-info">
+                    <div class="modal-avatar">김</div>
+                    <div class="modal-user-details">
+                        <h4 id="modal-user-name">김철수</h4>
+                        <span id="modal-user-department">개발팀</span>
+                    </div>
+                </div>
+                <p id="modal-message">이 요청에 대해 휴가를 부여하시겠습니까?</p>
+                <div id="reason-section" style="display: none;">
+                    <label for="reason-input">반려 사유</label>
+                    <textarea id="reason-input" placeholder="반려 사유를 입력해주세요..." rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal()">취소</button>
+                <button id="confirm-btn" class="modal-btn confirm">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 첨부파일 보기 모달 -->
+    <div id="attachment-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="attachment-title">첨부파일</h3>
+                <button class="close-btn" onclick="closeAttachmentModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="attachment-content">
+                    <p>첨부파일을 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script src="../js/vacation-admin.js"></script>
+    <script>
+        // 페이지 로드 시 권한별 메뉴 제어
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+        });
+    </script>
+</body>
+</html>

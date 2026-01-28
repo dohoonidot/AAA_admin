@@ -1,0 +1,466 @@
+
+> aaa-admin-panel@1.0.0 start
+> node server/server.js
+
+데이터베이스 모듈 로드됨
+서버가 http://localhost:9999 에서 실행 중입니다.
+PostgreSQL 데이터베이스에 성공적으로 연결되었습니다.
+=== API 요청 ===
+GET /gifts/organization-tree
+전체 URL: /api/gifts/organization-tree?adminRole=1&userId=admin@aspnc.com
+Headers: {
+  "host": "localhost:9999",
+  "user-agent": "curl/8.5.0",
+  "accept": "*/*",
+  "x-admin-role": "1",
+  "x-user-id": "admin@aspnc.com"
+}
+🏢 조직도 컨트롤러 시작
+👤 요청 권한 정보: { adminRole: '1', userId: 'admin@aspnc.com' }
+🗄️ 조직도 모델 getOrganizationTree 시작
+🔍 DB 연결 상태 확인 중...
+📊 실행할 쿼리: 
+        SELECT email, dept, name
+        FROM hr.view_hr
+        WHERE is_worked = '재직'
+        ORDER BY dept, name;
+      
+📊 DB 쿼리 실행 시작...
+📊 쿼리 결과 전체: Result {
+  command: 'SELECT',
+  rowCount: 340,
+  oid: null,
+  rows: [
+    { email: 'noey13@aspnc.com', dept: '경영관리실', name: '김서연' },
+    { email: 'sunny@aspnc.com', dept: '경영관리실', name: '박정선' },
+    { email: 'dam@aspnc.com', dept: '경영관리실', name: '이소담' },
+    { email: 'sjlee@aspnc.com', dept: '경영관리실', name: '이수진' },
+    { email: 'jychoi@aspnc.com', dept: '경영관리실', name: '최진영' },
+    { email: 'hne@aspnc.com', dept: '경영관리실', name: '황노을' },
+    { email: 'kimminho9999@aspnc.com', dept: '남부지사', name: '김민호' },
+    { email: 'noah@aspnc.com', dept: '남부지사', name: '김수협' },
+    { email: 'kyk0228k@aspnc.com', dept: '남부지사', name: '김영근' },
+    { email: 'pskyh91@aspnc.com', dept: '남부지사', name: '김영헌' },
+    { email: 'evankim@aspnc.com', dept: '남부지사', name: '김윤수' },
+    { email: 'rlawguss00@aspnc.com', dept: '남부지사', name: '김지현' },
+    { email: 'sk66@aspnc.com', dept: '남부지사', name: '박성국' },
+    { email: 'greed14@aspnc.com', dept: '남부지사', name: '박수현' },
+    { email: 'bangjy@aspnc.com', dept: '남부지사', name: '방지윤' },
+    { email: 'skseo@aspnc.com', dept: '남부지사', name: '서상기' },
+    { email: 'been00@aspnc.com', dept: '남부지사', name: '서소빈' },
+    { email: 'jhsong@aspnc.com', dept: '남부지사', name: '송재환' },
+    { email: 'hjahn@aspnc.com', dept: '남부지사', name: '안흥진' },
+    { email: 'ys0694@aspnc.com', dept: '남부지사', name: '위윤수' },
+    { email: 'ulins0209@aspnc.com', dept: '남부지사', name: '유예린' },
+    { email: 'sua0522@aspnc.com', dept: '남부지사', name: '윤수아' },
+    { email: 'ldm1026@aspnc.com', dept: '남부지사', name: '이다민' },
+    { email: 'leeah0018@aspnc.com', dept: '남부지사', name: '이아름' },
+    { email: 'leepro@aspnc.com', dept: '남부지사', name: '이형돈' },
+    { email: 'jjm9888@aspnc.com', dept: '남부지사', name: '정정민' },
+    { email: 'jgm2450@aspnc.com', dept: '남부지사', name: '조규민' },
+    { email: 'ajrzh159@aspnc.com', dept: '남부지사', name: '조영규' },
+    { email: 'jiwoogihee99@aspnc.com', dept: '남부지사', name: '조지희' },
+    { email: 'yhnguswjd@aspnc.com', dept: '남부지사', name: '조현정' },
+    { email: 'yh8694@aspnc.com', dept: '남부지사', name: '주영현' },
+    { email: 'cjhan@aspnc.com', dept: '대표이사', name: '한창직' },
+    { email: 'i015768@aspnc.com', dept: '부문대표', name: '서경웅' },
+    { email: 'jinkyu@aspnc.com', dept: '솔루션사업부', name: '고진규' },
+    { email: 'rkdrb1027@aspnc.com', dept: '솔루션사업부', name: '김강규' },
+    { email: 'kimhy@aspnc.com', dept: '솔루션사업부', name: '김희영' },
+    { email: 'mspark@aspnc.com', dept: '솔루션사업부', name: '박민수' },
+    { email: 'hyerim@aspnc.com', dept: '솔루션사업부', name: '박혜림' },
+    { email: 'shs@aspnc.com', dept: '솔루션사업부', name: '신형섭' },
+    { email: 'simsh@aspnc.com', dept: '솔루션사업부', name: '심소현' },
+    { email: 'jjmini@aspnc.com', dept: '솔루션사업부', name: '안정민' },
+    { email: 'oki501@aspnc.com', dept: '솔루션사업부', name: '오경일' },
+    { email: 'vene20@aspnc.com', dept: '솔루션사업부', name: '이수민' },
+    { email: 'lar428@aspnc.com', dept: '솔루션사업부', name: '이아람' },
+    { email: 'cho4537@aspnc.com', dept: '솔루션사업부', name: '조현영' },
+    { email: 'cjh0915@aspnc.com', dept: '솔루션사업부', name: '지금홍' },
+    { email: 'jiangxiuli0527@aspnc.com', dept: '중국지사', name: '강수려' },
+    { email: 'jinguangzhe0328@aspnc.com', dept: '중국지사', name: '김광철' },
+    { email: 'jindongyan@aspnc.com', dept: '중국지사', name: '김동암' },
+    { email: 'jinmeilan0965@aspnc.com', dept: '중국지사', name: '김미란' },
+    { email: 'yhkim0614@aspnc.com', dept: '중국지사', name: '김영화' },
+    { email: 'jinquan@aspnc.com', dept: '중국지사', name: '김천' },
+    { email: 'jinzhegen0130@aspnc.com', dept: '중국지사', name: '김철근' },
+    { email: 'kimho1110@aspnc.com', dept: '중국지사', name: '김호' },
+    { email: 'nanguangjun@aspnc.com', dept: '중국지사', name: '남광준' },
+    { email: 'nanwenfeng@aspnc.com', dept: '중국지사', name: '남문봉' },
+    { email: 'psm0509@aspnc.com', dept: '중국지사', name: '박성민' },
+    { email: 'piaoshengyu@aspnc.com', dept: '중국지사', name: '박성옥' },
+    { email: 'parkjunbong@aspnc.com', dept: '중국지사', name: '박준봉' },
+    { email: 'tonypark0820@aspnc.com', dept: '중국지사', name: '박태봉' },
+    { email: 'phm5521@aspnc.com', dept: '중국지사', name: '박혜명' },
+    { email: 'banghonghi@aspnc.com', dept: '중국지사', name: '방홍희' },
+    { email: 'sulmeabeak0107@aspnc.com', dept: '중국지사', name: '백설매' },
+    { email: 'tjdgns1002@aspnc.com', dept: '중국지사', name: '신성훈' },
+    { email: 'leekumhwa@aspnc.com', dept: '중국지사', name: '이금화' },
+    { email: 'lilin082@aspnc.com', dept: '중국지사', name: '이림' },
+    { email: 'lizhuguo13@aspnc.com', dept: '중국지사', name: '이수국' },
+    { email: 'cslee0725@aspnc.com', dept: '중국지사', name: '이천수' },
+    { email: 'lizhe0315@aspnc.com', dept: '중국지사', name: '이철' },
+    { email: 'liqinghai@aspnc.com', dept: '중국지사', name: '이청해' },
+    { email: 'lihuijing@aspnc.com', dept: '중국지사', name: '이혜정' },
+    { email: 'lihuajun@aspnc.com', dept: '중국지사', name: '이화군' },
+    { email: 'zhijianguo0226@aspnc.com', dept: '중국지사', name: '지건국' },
+    { email: 'jilongger0423@aspnc.com', dept: '중국지사', name: '지룡걸' },
+    { email: 'chenxu@aspnc.com', dept: '중국지사', name: '진욱' },
+    { email: 'guanghai.cui@aspnc.com', dept: '중국지사', name: '최광해' },
+    { email: 'cuizhengri@aspnc.com', dept: '중국지사', name: '최정일' },
+    { email: 'xuanmeina@aspnc.com', dept: '중국지사', name: '현미나' },
+    { email: 'chengsong@aspnc.com', dept: '중국지사', name: '홍청송' },
+    { email: 'huangjingrong@aspnc.com', dept: '중국지사', name: '황경융' },
+    { email: 'huangyuanyi@aspnc.com', dept: '중국지사', name: '황원일' },
+    { email: 'kangmy@aspnc.com', dept: 'BAC사업부', name: '강문용' },
+    { email: 'hyein.kim@aspnc.com', dept: 'BAC사업부', name: '김혜인' },
+    { email: 'sjpark@aspnc.com', dept: 'BAC사업부', name: '박수진' },
+    { email: 'junhyuk@aspnc.com', dept: 'BAC사업부', name: '박준혁' },
+    { email: 'gyuwon.bae@aspnc.com', dept: 'BAC사업부', name: '배규원' },
+    { email: 'asm@aspnc.com', dept: 'BAC사업부', name: '안선미' },
+    { email: 'phily@aspnc.com', dept: 'BAC사업부', name: '양필' },
+    { email: 'tjdus1226@aspnc.com', dept: 'BAC사업부', name: '윤서연' },
+    { email: 'kyungho.lee@aspnc.com', dept: 'BAC사업부', name: '이경호' },
+    { email: 'wookpitt@aspnc.com', dept: 'BAC사업부', name: '이병욱' },
+    { email: 'bhlee@aspnc.com', dept: 'BAC사업부', name: '이병훈' },
+    { email: 'seokey@aspnc.com', dept: 'BAC사업부', name: '이석희' },
+    { email: 'neomail@aspnc.com', dept: 'BAC사업부', name: '이성보' },
+    { email: 'suhyeok.lee@aspnc.com', dept: 'BAC사업부', name: '이수혁' },
+    { email: 'hil0513@aspnc.com', dept: 'BAC사업부', name: '이혜인' },
+    { email: 'louis111@aspnc.com', dept: 'BAC사업부', name: '이희진' },
+    { email: 'dhkim@aspnc.com', dept: 'BDS사업부', name: '김도하' },
+    { email: 'kimtaeeun@aspnc.com', dept: 'BDS사업부', name: '김태언' },
+    { email: 'jjenny@aspnc.com', dept: 'BDS사업부', name: '박재은' },
+    ... 240 more items
+  ],
+  fields: [
+    Field {
+      name: 'email',
+      tableID: 166881,
+      columnID: 9,
+      dataTypeID: 1043,
+      dataTypeSize: -1,
+      dataTypeModifier: 54,
+      format: 'text'
+    },
+    Field {
+      name: 'dept',
+      tableID: 166881,
+      columnID: 4,
+      dataTypeID: 1043,
+      dataTypeSize: -1,
+      dataTypeModifier: 34,
+      format: 'text'
+    },
+    Field {
+      name: 'name',
+      tableID: 166881,
+      columnID: 2,
+      dataTypeID: 1043,
+      dataTypeSize: -1,
+      dataTypeModifier: 14,
+      format: 'text'
+    }
+  ],
+  _parsers: [ [Function: noParse], [Function: noParse], [Function: noParse] ],
+  _types: TypeOverrides {
+    _types: {
+      getTypeParser: [Function: getTypeParser],
+      setTypeParser: [Function: setTypeParser],
+      arrayParser: [Object],
+      builtins: [Object]
+    },
+    text: {},
+    binary: {}
+  },
+  RowCtor: null,
+  rowAsArray: false,
+  _prebuiltEmptyResultObject: { email: null, dept: null, name: null }
+}
+📊 쿼리 결과 타입: object
+📊 쿼리 결과 구조: [
+  'command',
+  'rowCount',
+  'oid',
+  'rows',
+  'fields',
+  '_parsers',
+  '_types',
+  'RowCtor',
+  'rowAsArray',
+  '_prebuiltEmptyResultObject'
+]
+📊 쿼리 결과 행 수: 340
+✅ 조직도 트리 생성 완료. 부서 수: 19
+  부서 1: 경영관리실 (6명)
+  부서 2: 남부지사 (25명)
+  부서 3: 대표이사 (1명)
+  부서 4: 부문대표 (1명)
+  부서 5: 솔루션사업부 (13명)
+  부서 6: 중국지사 (35명)
+  부서 7: BAC사업부 (16명)
+  부서 8: BDS사업부 (9명)
+  부서 9: Biz AI사업부 (8명)
+  부서 10: DTE본부 (50명)
+  부서 11: FCM사업부 (48명)
+  부서 12: HRS사업부 (18명)
+  부서 13: IES본부 (2명)
+  부서 14: Innovation Center (5명)
+  부서 15: ITS사업부 (24명)
+  부서 16: New Tech사업부 (7명)
+  부서 17: NGE본부 (6명)
+  부서 18: PUBLIC CLOUD사업부 (15명)
+  부서 19: SCM사업부 (51명)
+✅ 조직도 데이터 조회 성공. 부서 수: 19
+=== API 요청 ===
+GET /gifts/organization-tree
+전체 URL: /api/gifts/organization-tree
+Headers: {
+  "host": "localhost:9999",
+  "connection": "keep-alive",
+  "x-admin-role": "1",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "x-user-id": "admin@aspnc.com",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Google Chrome\";v=\"138\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:9999/pages/gifts.html",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7"
+}
+🏢 조직도 컨트롤러 시작
+👤 요청 권한 정보: { adminRole: '1', userId: 'admin@aspnc.com' }
+🗄️ 조직도 모델 getOrganizationTree 시작
+🔍 DB 연결 상태 확인 중...
+📊 실행할 쿼리: 
+        SELECT email, dept, name
+        FROM hr.view_hr
+        WHERE is_worked = '재직'
+        ORDER BY dept, name;
+      
+📊 DB 쿼리 실행 시작...
+📊 쿼리 결과 전체: Result {
+  command: 'SELECT',
+  rowCount: 340,
+  oid: null,
+  rows: [
+    { email: 'noey13@aspnc.com', dept: '경영관리실', name: '김서연' },
+    { email: 'sunny@aspnc.com', dept: '경영관리실', name: '박정선' },
+    { email: 'dam@aspnc.com', dept: '경영관리실', name: '이소담' },
+    { email: 'sjlee@aspnc.com', dept: '경영관리실', name: '이수진' },
+    { email: 'jychoi@aspnc.com', dept: '경영관리실', name: '최진영' },
+    { email: 'hne@aspnc.com', dept: '경영관리실', name: '황노을' },
+    { email: 'kimminho9999@aspnc.com', dept: '남부지사', name: '김민호' },
+    { email: 'noah@aspnc.com', dept: '남부지사', name: '김수협' },
+    { email: 'kyk0228k@aspnc.com', dept: '남부지사', name: '김영근' },
+    { email: 'pskyh91@aspnc.com', dept: '남부지사', name: '김영헌' },
+    { email: 'evankim@aspnc.com', dept: '남부지사', name: '김윤수' },
+    { email: 'rlawguss00@aspnc.com', dept: '남부지사', name: '김지현' },
+    { email: 'sk66@aspnc.com', dept: '남부지사', name: '박성국' },
+    { email: 'greed14@aspnc.com', dept: '남부지사', name: '박수현' },
+    { email: 'bangjy@aspnc.com', dept: '남부지사', name: '방지윤' },
+    { email: 'skseo@aspnc.com', dept: '남부지사', name: '서상기' },
+    { email: 'been00@aspnc.com', dept: '남부지사', name: '서소빈' },
+    { email: 'jhsong@aspnc.com', dept: '남부지사', name: '송재환' },
+    { email: 'hjahn@aspnc.com', dept: '남부지사', name: '안흥진' },
+    { email: 'ys0694@aspnc.com', dept: '남부지사', name: '위윤수' },
+    { email: 'ulins0209@aspnc.com', dept: '남부지사', name: '유예린' },
+    { email: 'sua0522@aspnc.com', dept: '남부지사', name: '윤수아' },
+    { email: 'ldm1026@aspnc.com', dept: '남부지사', name: '이다민' },
+    { email: 'leeah0018@aspnc.com', dept: '남부지사', name: '이아름' },
+    { email: 'leepro@aspnc.com', dept: '남부지사', name: '이형돈' },
+    { email: 'jjm9888@aspnc.com', dept: '남부지사', name: '정정민' },
+    { email: 'jgm2450@aspnc.com', dept: '남부지사', name: '조규민' },
+    { email: 'ajrzh159@aspnc.com', dept: '남부지사', name: '조영규' },
+    { email: 'jiwoogihee99@aspnc.com', dept: '남부지사', name: '조지희' },
+    { email: 'yhnguswjd@aspnc.com', dept: '남부지사', name: '조현정' },
+    { email: 'yh8694@aspnc.com', dept: '남부지사', name: '주영현' },
+    { email: 'cjhan@aspnc.com', dept: '대표이사', name: '한창직' },
+    { email: 'i015768@aspnc.com', dept: '부문대표', name: '서경웅' },
+    { email: 'jinkyu@aspnc.com', dept: '솔루션사업부', name: '고진규' },
+    { email: 'rkdrb1027@aspnc.com', dept: '솔루션사업부', name: '김강규' },
+    { email: 'kimhy@aspnc.com', dept: '솔루션사업부', name: '김희영' },
+    { email: 'mspark@aspnc.com', dept: '솔루션사업부', name: '박민수' },
+    { email: 'hyerim@aspnc.com', dept: '솔루션사업부', name: '박혜림' },
+    { email: 'shs@aspnc.com', dept: '솔루션사업부', name: '신형섭' },
+    { email: 'simsh@aspnc.com', dept: '솔루션사업부', name: '심소현' },
+    { email: 'jjmini@aspnc.com', dept: '솔루션사업부', name: '안정민' },
+    { email: 'oki501@aspnc.com', dept: '솔루션사업부', name: '오경일' },
+    { email: 'vene20@aspnc.com', dept: '솔루션사업부', name: '이수민' },
+    { email: 'lar428@aspnc.com', dept: '솔루션사업부', name: '이아람' },
+    { email: 'cho4537@aspnc.com', dept: '솔루션사업부', name: '조현영' },
+    { email: 'cjh0915@aspnc.com', dept: '솔루션사업부', name: '지금홍' },
+    { email: 'jiangxiuli0527@aspnc.com', dept: '중국지사', name: '강수려' },
+    { email: 'jinguangzhe0328@aspnc.com', dept: '중국지사', name: '김광철' },
+    { email: 'jindongyan@aspnc.com', dept: '중국지사', name: '김동암' },
+    { email: 'jinmeilan0965@aspnc.com', dept: '중국지사', name: '김미란' },
+    { email: 'yhkim0614@aspnc.com', dept: '중국지사', name: '김영화' },
+    { email: 'jinquan@aspnc.com', dept: '중국지사', name: '김천' },
+    { email: 'jinzhegen0130@aspnc.com', dept: '중국지사', name: '김철근' },
+    { email: 'kimho1110@aspnc.com', dept: '중국지사', name: '김호' },
+    { email: 'nanguangjun@aspnc.com', dept: '중국지사', name: '남광준' },
+    { email: 'nanwenfeng@aspnc.com', dept: '중국지사', name: '남문봉' },
+    { email: 'psm0509@aspnc.com', dept: '중국지사', name: '박성민' },
+    { email: 'piaoshengyu@aspnc.com', dept: '중국지사', name: '박성옥' },
+    { email: 'parkjunbong@aspnc.com', dept: '중국지사', name: '박준봉' },
+    { email: 'tonypark0820@aspnc.com', dept: '중국지사', name: '박태봉' },
+    { email: 'phm5521@aspnc.com', dept: '중국지사', name: '박혜명' },
+    { email: 'banghonghi@aspnc.com', dept: '중국지사', name: '방홍희' },
+    { email: 'sulmeabeak0107@aspnc.com', dept: '중국지사', name: '백설매' },
+    { email: 'tjdgns1002@aspnc.com', dept: '중국지사', name: '신성훈' },
+    { email: 'leekumhwa@aspnc.com', dept: '중국지사', name: '이금화' },
+    { email: 'lilin082@aspnc.com', dept: '중국지사', name: '이림' },
+    { email: 'lizhuguo13@aspnc.com', dept: '중국지사', name: '이수국' },
+    { email: 'cslee0725@aspnc.com', dept: '중국지사', name: '이천수' },
+    { email: 'lizhe0315@aspnc.com', dept: '중국지사', name: '이철' },
+    { email: 'liqinghai@aspnc.com', dept: '중국지사', name: '이청해' },
+    { email: 'lihuijing@aspnc.com', dept: '중국지사', name: '이혜정' },
+    { email: 'lihuajun@aspnc.com', dept: '중국지사', name: '이화군' },
+    { email: 'zhijianguo0226@aspnc.com', dept: '중국지사', name: '지건국' },
+    { email: 'jilongger0423@aspnc.com', dept: '중국지사', name: '지룡걸' },
+    { email: 'chenxu@aspnc.com', dept: '중국지사', name: '진욱' },
+    { email: 'guanghai.cui@aspnc.com', dept: '중국지사', name: '최광해' },
+    { email: 'cuizhengri@aspnc.com', dept: '중국지사', name: '최정일' },
+    { email: 'xuanmeina@aspnc.com', dept: '중국지사', name: '현미나' },
+    { email: 'chengsong@aspnc.com', dept: '중국지사', name: '홍청송' },
+    { email: 'huangjingrong@aspnc.com', dept: '중국지사', name: '황경융' },
+    { email: 'huangyuanyi@aspnc.com', dept: '중국지사', name: '황원일' },
+    { email: 'kangmy@aspnc.com', dept: 'BAC사업부', name: '강문용' },
+    { email: 'hyein.kim@aspnc.com', dept: 'BAC사업부', name: '김혜인' },
+    { email: 'sjpark@aspnc.com', dept: 'BAC사업부', name: '박수진' },
+    { email: 'junhyuk@aspnc.com', dept: 'BAC사업부', name: '박준혁' },
+    { email: 'gyuwon.bae@aspnc.com', dept: 'BAC사업부', name: '배규원' },
+    { email: 'asm@aspnc.com', dept: 'BAC사업부', name: '안선미' },
+    { email: 'phily@aspnc.com', dept: 'BAC사업부', name: '양필' },
+    { email: 'tjdus1226@aspnc.com', dept: 'BAC사업부', name: '윤서연' },
+    { email: 'kyungho.lee@aspnc.com', dept: 'BAC사업부', name: '이경호' },
+    { email: 'wookpitt@aspnc.com', dept: 'BAC사업부', name: '이병욱' },
+    { email: 'bhlee@aspnc.com', dept: 'BAC사업부', name: '이병훈' },
+    { email: 'seokey@aspnc.com', dept: 'BAC사업부', name: '이석희' },
+    { email: 'neomail@aspnc.com', dept: 'BAC사업부', name: '이성보' },
+    { email: 'suhyeok.lee@aspnc.com', dept: 'BAC사업부', name: '이수혁' },
+    { email: 'hil0513@aspnc.com', dept: 'BAC사업부', name: '이혜인' },
+    { email: 'louis111@aspnc.com', dept: 'BAC사업부', name: '이희진' },
+    { email: 'dhkim@aspnc.com', dept: 'BDS사업부', name: '김도하' },
+    { email: 'kimtaeeun@aspnc.com', dept: 'BDS사업부', name: '김태언' },
+    { email: 'jjenny@aspnc.com', dept: 'BDS사업부', name: '박재은' },
+    ... 240 more items
+  ],
+  fields: [
+    Field {
+      name: 'email',
+      tableID: 166881,
+      columnID: 9,
+      dataTypeID: 1043,
+      dataTypeSize: -1,
+      dataTypeModifier: 54,
+      format: 'text'
+    },
+    Field {
+      name: 'dept',
+      tableID: 166881,
+      columnID: 4,
+      dataTypeID: 1043,
+      dataTypeSize: -1,
+      dataTypeModifier: 34,
+      format: 'text'
+    },
+    Field {
+      name: 'name',
+      tableID: 166881,
+      columnID: 2,
+      dataTypeID: 1043,
+      dataTypeSize: -1,
+      dataTypeModifier: 14,
+      format: 'text'
+    }
+  ],
+  _parsers: [ [Function: noParse], [Function: noParse], [Function: noParse] ],
+  _types: TypeOverrides {
+    _types: {
+      getTypeParser: [Function: getTypeParser],
+      setTypeParser: [Function: setTypeParser],
+      arrayParser: [Object],
+      builtins: [Object]
+    },
+    text: {},
+    binary: {}
+  },
+  RowCtor: null,
+  rowAsArray: false,
+  _prebuiltEmptyResultObject: { email: null, dept: null, name: null }
+}
+📊 쿼리 결과 타입: object
+📊 쿼리 결과 구조: [
+  'command',
+  'rowCount',
+  'oid',
+  'rows',
+  'fields',
+  '_parsers',
+  '_types',
+  'RowCtor',
+  'rowAsArray',
+  '_prebuiltEmptyResultObject'
+]
+📊 쿼리 결과 행 수: 340
+✅ 조직도 트리 생성 완료. 부서 수: 19
+  부서 1: 경영관리실 (6명)
+  부서 2: 남부지사 (25명)
+  부서 3: 대표이사 (1명)
+  부서 4: 부문대표 (1명)
+  부서 5: 솔루션사업부 (13명)
+  부서 6: 중국지사 (35명)
+  부서 7: BAC사업부 (16명)
+  부서 8: BDS사업부 (9명)
+  부서 9: Biz AI사업부 (8명)
+  부서 10: DTE본부 (50명)
+  부서 11: FCM사업부 (48명)
+  부서 12: HRS사업부 (18명)
+  부서 13: IES본부 (2명)
+  부서 14: Innovation Center (5명)
+  부서 15: ITS사업부 (24명)
+  부서 16: New Tech사업부 (7명)
+  부서 17: NGE본부 (6명)
+  부서 18: PUBLIC CLOUD사업부 (15명)
+  부서 19: SCM사업부 (51명)
+✅ 조직도 데이터 조회 성공. 부서 수: 19
+=== API 요청 ===
+POST /gifts/send
+전체 URL: /api/gifts/send
+Headers: {
+  "host": "localhost:9999",
+  "connection": "keep-alive",
+  "content-length": "125",
+  "x-admin-role": "1",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "x-user-id": "admin@aspnc.com",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Google Chrome\";v=\"138\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:9999",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:9999/pages/gifts.html",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7"
+}
+선물 발송 오류: TypeError: Cannot read properties of undefined (reading 'id')
+    at sendGift (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/server/controllers/gifts.controller.js:229:36)
+    at Layer.handle [as handle_request] (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/layer.js:95:5)
+    at next (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/layer.js:95:5)
+    at /mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/index.js:346:12)
+    at next (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/index.js:280:10)
+    at Function.handle (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/index.js:175:3)
+    at router (/mnt/c/AI_Agent/AI_Agent/AAA_Admin/Agent_adimn_beforeDashboard/node_modules/express/lib/router/index.js:47:12)

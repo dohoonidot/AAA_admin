@@ -1,0 +1,74 @@
+/* 정렬 가능한 테이블 헤더 스타일 */
+.sortable-header {
+    cursor: pointer !important;
+    user-select: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sortable-header:hover {
+    background-color: #F1F5F9 !important;
+    color: #3B82F6 !important;
+}
+
+.sort-icon {
+    font-size: 12px;
+    margin-left: 5px;
+    color: #94A3B8;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.sortable-header:hover .sort-icon {
+    color: #3B82F6;
+    transform: scale(1.1);
+}
+
+/* 부서 필터 드롭다운 스타일 */
+.department-filter {
+    padding: 6px 10px;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 10px;
+    min-width: 120px;
+}
+
+.department-filter:hover {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.department-filter:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 부서별 그룹핑 시각적 효과 */
+.department-group {
+    border-left: 3px solid #3B82F6;
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.department-header {
+    background-color: rgba(59, 130, 246, 0.1);
+    font-weight: 600;
+    color: #1E40AF;
+}
+
+/* 정렬 상태 표시 */
+.sort-active {
+    background-color: #EBF4FF !important;
+    color: #1E40AF !important;
+    font-weight: 600;
+}
+
+.sort-active .sort-icon {
+    color: #3B82F6 !important;
+    font-weight: bold;
+}

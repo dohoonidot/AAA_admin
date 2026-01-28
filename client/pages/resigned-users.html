@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴사자 관리 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/users.css">
+    <link rel="stylesheet" href="../css/resigned-users.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown active">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item active">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="user-controls">
+                <div class="page-header-info">
+                    <h2>퇴사자 관리</h2>
+                    <p class="page-description">퇴사한 직원들의 정보와 휴가 사용 이력을 확인할 수 있습니다.</p>
+                </div>
+                <div class="filter-controls">
+                    <div class="search-container">
+                        <input type="text" id="user-search" placeholder="이름 또는 ID 검색...">
+                        <button class="search-button" id="search-user">검색</button>
+                    </div>
+                    <div class="filter-container">
+                        <select id="department-filter">
+                            <option value="all">전체 부서</option>
+                            <option value="경영관리실">경영관리실</option>
+                            <option value="New Tech사업부">New Tech사업부</option>
+                            <option value="솔루션사업부">솔루션사업부</option>
+                            <option value="FCM사업부">FCM사업부</option>
+                            <option value="SCM사업부">SCM사업부</option>
+                            <option value="Innovation Center">Innovation Center</option>
+                            <option value="Biz AI사업부">Biz AI사업부</option>
+                            <option value="HRS사업부">HRS사업부</option>
+                            <option value="DTE본부">DTE본부</option>
+                            <option value="남부지사">남부지사</option>
+                            <option value="중국지사">중국지사</option>
+                            <option value="PUBLIC CLOUD사업부">PUBLIC CLOUD사업부</option>
+                            <option value="ITS사업부">ITS사업부</option>
+                            <option value="BAC사업부">BAC사업부</option>
+                            <option value="BDS사업부">BDS사업부</option>
+                            <option value="NGE본부">NGE본부</option>
+                            <option value="대표이사">대표이사</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="users-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>ID</th>
+                            <th>이름</th>
+                            <th>부서</th>
+                            <th>직급</th>
+                            <th>퇴사일</th>
+                            <th>휴가 이력</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 퇴사자 데이터가 여기에 동적으로 추가됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- 퇴사자 상세정보 모달 -->
+    <div id="user-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>퇴사자 상세정보</h2>
+                <span class="close-modal" onclick="closeUserDetailModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <h3>기본 정보</h3>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <span class="label">이름:</span>
+                            <span id="detail-username" class="value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">ID:</span>
+                            <span id="detail-userId" class="value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">부서:</span>
+                            <span id="detail-department" class="value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">직급:</span>
+                            <span id="detail-position" class="value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">직책:</span>
+                            <span id="detail-title" class="value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">퇴사일:</span>
+                            <span id="detail-resignedDate" class="value">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>권한 정보</h3>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <span class="label">관리권한:</span>
+                            <span id="detail-adminRole" class="value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">AAA 조회권한:</span>
+                            <span id="detail-permission" class="value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">CSR 조회권한:</span>
+                            <span id="detail-csrSearchDiv" class="value">-</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 재직자로 복귀 버튼 -->
+                <div class="modal-actions" style="clear: both; margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-top: 1px solid #dee2e6;">
+                    <button type="button" id="restore-to-active-btn" class="btn-restore" style="background-color: #28a745; border-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        재직자로 복귀
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 휴가 이력 모달 -->
+    <div id="vacation-history-modal" class="modal">
+        <div class="modal-content" style="max-width: 1200px; width: 95%; max-height: 90vh;">
+            <div class="modal-header">
+                <h2 id="modal-user-name">휴가 사용 이력</h2>
+                <span class="close-modal" onclick="closeVacationModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 120px);">
+                <div class="info-row" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e5e7eb;">
+                    <span class="label" style="font-weight: 600; color: #6b7280;">사용자 ID:</span>
+                    <span id="modal-user-id" class="value" style="color: #1a1f36; font-family: monospace;">-</span>
+                </div>
+                <div class="vacation-history-table" style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="padding: 14px; text-align: center; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4a5568; font-size: 0.875rem; width: 60px;">No.</th>
+                                <th style="padding: 14px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4a5568; font-size: 0.875rem; width: 80px;">연도</th>
+                                <th style="padding: 14px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4a5568; font-size: 0.875rem;">휴가 종류</th>
+                                <th style="padding: 14px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4a5568; font-size: 0.875rem; width: 200px;">휴가 기간</th>
+                                <th style="padding: 14px; text-align: center; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4a5568; font-size: 0.875rem; width: 80px;">사용일수</th>
+                                <th style="padding: 14px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4a5568; font-size: 0.875rem; width: 180px;">신청일</th>
+                                <th style="padding: 14px; text-align: center; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4a5568; font-size: 0.875rem; width: 100px;">상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vacation-history-list">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">데이터를 불러오는 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script src="../js/resigned-users.js"></script>
+    <script>
+        // 페이지 로드 시 권한별 메뉴 제어
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+        });
+    </script>
+</body>
+</html>

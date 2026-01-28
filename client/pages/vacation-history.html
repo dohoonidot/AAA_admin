@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부여내역 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/vacation-admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown active">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item active">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                        <a href="vacation-approval-history.html" class="sidebar-dropdown-item">휴가신청승인 관리</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <div class="header-content">
+                    <div class="title-section">
+                        <h1>부여내역</h1>
+                        <p class="subtitle">처리 완료된 휴가 부여 내역을 확인할 수 있습니다</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content active">
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>신청자</th>
+                                <th>부서</th>
+                                <th>휴가 유형</th>
+                                <th>리셋기간</th>
+                                <th>일수</th>
+                                <th>신청일</th>
+                                <th>처리일</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- API 데이터로 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div class="pagination-container" id="history-pagination" style="display: none;">
+                    <button id="first-page-btn" class="pagination-btn" onclick="goToFirstHistoryPage()">« 처음</button>
+                    <button id="prev-page-btn" class="pagination-btn" onclick="changeHistoryPage(-1)">‹ 이전</button>
+                    
+                    <!-- 페이지 번호 버튼들 -->
+                    <div id="history-page-numbers" style="display: flex; gap: 4px; align-items: center;"></div>
+                    
+                    <button id="next-page-btn" class="pagination-btn" onclick="changeHistoryPage(1)">다음 ›</button>
+                    <button id="last-page-btn" class="pagination-btn" onclick="goToLastHistoryPage()">마지막 »</button>
+                    
+                    <!-- 페이지 정보 -->
+                    <span id="page-info" class="page-info">1 / 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 부여내역 상세 모달 -->
+    <div id="history-detail-modal" class="modal" style="display: none;" onclick="if(event.target === this) closeHistoryDetailModal();">
+        <div class="modal-content" style="max-width: 600px;" onclick="event.stopPropagation();">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+                <h2 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a1f36;">휴가 부여 내역 상세</h2>
+                <button onclick="closeHistoryDetailModal()" style="background: none; border: none; font-size: 28px; color: #6b7280; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='transparent'">&times;</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- 신청자 정보 -->
+                <div class="info-row">
+                    <div class="label">신청자</div>
+                    <div class="value" id="modal-applicant">-</div>
+                </div>
+
+                <!-- 부서 -->
+                <div class="info-row">
+                    <div class="label">부서</div>
+                    <div class="value" id="modal-department">-</div>
+                </div>
+
+                <!-- 휴가 유형 -->
+                <div class="info-row">
+                    <div class="label">휴가 유형</div>
+                    <div class="value" id="modal-leave-type">-</div>
+                </div>
+
+                <!-- 리셋기간 -->
+                <div class="info-row">
+                    <div class="label">리셋기간</div>
+                    <div class="value" id="modal-reset-date">-</div>
+                </div>
+
+                <!-- 부여 일수 -->
+                <div class="info-row">
+                    <div class="label">부여 일수</div>
+                    <div class="value" id="modal-grant-days">-</div>
+                </div>
+
+                <!-- 신청일 -->
+                <div class="info-row">
+                    <div class="label">신청일</div>
+                    <div class="value" id="modal-approval-date">-</div>
+                </div>
+
+                <!-- 처리일 -->
+                <div class="info-row">
+                    <div class="label">처리일</div>
+                    <div class="value" id="modal-proc-date">-</div>
+                </div>
+
+                <!-- 상태 -->
+                <div class="info-row">
+                    <div class="label">상태</div>
+                    <div class="value" id="modal-status">-</div>
+                </div>
+
+                <!-- 메모 -->
+                <div class="info-row" style="flex-direction: column; align-items: flex-start;">
+                    <div class="label" style="margin-bottom: 8px;">메모</div>
+                    <div class="value" id="modal-memo" style="width: 100%; padding: 12px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; min-height: 80px; white-space: pre-wrap; word-wrap: break-word;">로딩 중...</div>
+                </div>
+            </div>
+
+            <!-- 모달 하단 버튼 -->
+            <div style="padding: 20px 24px; border-top: 1px solid #e5e7eb; display: flex; gap: 12px; justify-content: flex-end; background-color: #f9fafb; margin-top: 24px;">
+                <button onclick="closeHistoryDetailModal()" style="padding: 12px 24px; background-color: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; font-size: 0.95rem;" onmouseover="this.style.backgroundColor='#4b5563'" onmouseout="this.style.backgroundColor='#6b7280'">
+                    닫기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script src="../js/vacation-admin.js"></script>
+    <script>
+        // 페이지 로드 시 권한별 메뉴 제어 및 부여내역 데이터 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+            // 부여내역 탭 데이터 자동 로드
+            setTimeout(() => {
+                if (typeof loadGrantHistory === 'function') {
+                    loadGrantHistory(1);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

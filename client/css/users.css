@@ -1,0 +1,1056 @@
+/* 사용자 관리 페이지 스타일 */
+:root {
+    /* 색상 변수 */
+    --primary-color: #3182F6;
+    --primary-hover: #2167d8;
+    --danger-color: #e53535;
+    --danger-hover: #c62828;
+    --success-color: #2ecc71;
+    --warning-color: #fb8500;
+    --info-color: #4361ee;
+    --text-primary: #1a1f36;
+    --text-secondary: #4a6fdc;
+    --text-muted: #64748b;
+    --border-color: #e6e6e6;
+    --bg-light: #f4f8ff;
+    --bg-hover: #f0f7ff;
+    --bg-active: #e1f7e1;
+    --bg-inactive: #ffe1e1;
+    
+    /* 여백 변수 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 10px;
+    --spacing-lg: 15px;
+    --spacing-xl: 20px;
+    
+    /* 폰트 크기 변수 */
+    --font-xs: 12px;
+    --font-sm: 13px;
+    --font-md: 14px;
+    --font-lg: 15px;
+    --font-xl: 16px;
+    
+    /* 테두리 반경 변수 */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+}
+
+/* 필터 스타일 */
+.user-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-top: 16px;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex: 1;
+    flex-wrap: nowrap;
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 200px;
+    width: auto;
+    margin-top: 2px;
+}
+
+.search-container input[type="text"] {
+    padding: 8px 70px 8px 8px;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    width: 100%;
+    background-color: white;
+    height: 36px;
+    transition: all 0.2s ease;
+}
+
+.search-container input[type="text"]:focus {
+    outline: none;
+    border-color: #3182F6;
+    box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1);
+}
+
+.search-button {
+    position: absolute;
+    right: 3px;
+    top: 44%;
+    transform: translateY(-65%);
+    background-color: #3182F6;
+    color: white;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    height: 28px;
+    line-height: 1;
+    transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+    background-color: #2167d8;
+}
+
+.filter-container {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 2px;
+    flex-wrap: nowrap;
+}
+
+.filter-button {
+    background-color: #3182F6;
+    color: white;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    height: 36px;
+    transition: background-color 0.2s ease;
+    position: relative;
+    top: -6px;
+}
+
+.filter-button:hover {
+    background-color: #2167d8;
+}
+
+#department-filter,
+#position-filter,
+#title-filter,
+#role-filter,
+#csr-filter {
+    padding: 6px;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    background-color: white;
+    height: 36px;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+#department-filter {
+    min-width: 130px;
+}
+
+#position-filter {
+    min-width: 110px;
+}
+
+#title-filter {
+    min-width: 110px;
+}
+
+#role-filter {
+    min-width: 130px;
+}
+
+#csr-filter {
+    min-width: 110px;
+}
+
+#department-filter:focus,
+#position-filter:focus,
+#title-filter:focus,
+#role-filter:focus,
+#csr-filter:focus {
+    outline: none;
+    border-color: #3182F6;
+    box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1);
+}
+
+#add-user {
+    background-color: #3182F6;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    height: 36px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    position: relative;
+    top: -6px;
+    flex-shrink: 0;
+}
+
+#add-user:hover {
+    background-color: #2167d8;
+}
+
+/* 활성 필터 태그 스타일 */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 0;
+    width: 100%;
+    min-height: 36px;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    background-color: #f5f5f5;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.filter-tag {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.filter-tag:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--text-secondary);
+}
+
+.filter-tag button {
+    background: none;
+    border: none;
+    margin-left: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.filter-tag button:hover {
+    background-color: var(--bg-hover);
+    color: var(--danger-color);
+}
+
+/* 검색 결과 없음 스타일 */
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: #8c8c8c;
+    font-size: 18px;
+}
+
+/* 관리 버튼 스타일 */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin: 0;
+    padding: 4px 0;
+}
+
+.action-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    min-width: 40px;
+}
+
+.edit-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #2980b9;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+/* 관리권한 컬럼 스타일 */
+.admin-role-cell {
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: -60px;
+    padding-left: 0;
+    padding-right: 8px;
+}
+
+/* AAA 정보 조회권한 컬럼 스타일 */
+#users-table th:nth-child(7), /* 권한 */
+#users-table td:nth-child(7) {
+    width: 260px;
+    min-width: 260px;
+    max-width: 400px;
+    text-align: center;
+    white-space: normal;
+    word-break: keep-all;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 8px 4px;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.role-cell {
+    position: relative;
+    cursor: help;
+    text-align: center;
+    font-weight: bold;
+    color: #4a6fdc;
+    font-size: 13px !important;
+    white-space: normal;
+    word-break: keep-all;
+    line-height: 1.3;
+    padding: 8px 4px;
+    min-width: 200px;
+    width: 200px;
+}
+
+/* CSR 컬럼 스타일 */
+.csr-cell {
+    position: relative;
+    cursor: help;
+    text-align: center;
+    font-weight: bold;
+    color: #4a6fdc;
+}
+
+/* 권한 데이터 셀 스타일 */
+#users-table td:nth-child(8) {
+    font-weight: bold;
+}
+
+/* CSR 데이터 셀 스타일 */
+#users-table td:nth-child(9) {
+    font-weight: bold;
+    text-align: center;
+}
+
+.role-tooltip, .csr-tooltip {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    width: 280px;
+    z-index: 1000;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    white-space: normal;
+    word-break: keep-all;
+}
+
+.role-cell:hover .role-tooltip,
+.csr-cell:hover .csr-tooltip {
+    display: block;
+}
+
+.role-tooltip::before,
+.csr-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 5px 5px 5px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+}
+
+.role-tooltip div,
+.csr-tooltip div {
+    margin-bottom: 3px;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 12px;
+}
+
+.role-tooltip div:last-child,
+.csr-tooltip div:last-child {
+    border-bottom: none;
+}
+
+/* CSR 값 색상 */
+#users-table td:nth-child(9)[data-csr="1"] {
+    color: #2ecc71;
+}
+
+#users-table td:nth-child(9)[data-csr="0"] {
+    color: #e74c3c;
+}
+
+/* 테이블 컬럼 너비 설정 */
+#users-table th:nth-child(1), /* No. */
+#users-table td:nth-child(1) {
+    width: 60px;
+    text-align: center;
+}
+
+#users-table th:nth-child(2), /* 이름 */
+#users-table td:nth-child(2) {
+    width: 70px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+#users-table th:nth-child(3), /* ID */
+#users-table td:nth-child(3) {
+    width: 120px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* 부서 컬럼은 position-cell 클래스 사용 */
+#users-table th:nth-child(4), /* 부서 */
+#users-table td:nth-child(4) {
+    width: 160px;
+    min-width: 160px;
+    max-width: 300px;
+    white-space: normal;
+    word-break: keep-all;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+#users-table th:nth-child(5), /* 직급 */
+#users-table td:nth-child(5) {
+    width: 100px;
+    min-width: 100px;
+    max-width: 200px;
+    white-space: normal;
+    word-break: keep-all;
+    overflow: visible;
+    text-overflow: unset;
+    padding-left: 8px;
+    padding-right: 0;
+}
+
+#users-table th:nth-child(6), /* 직책 */
+#users-table td:nth-child(6) {
+    width: 100px;
+    min-width: 100px;
+    max-width: 200px;
+    white-space: normal;
+    word-break: keep-all;
+    overflow: visible;
+    text-overflow: unset;
+    padding-left: 8px;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+#users-table th:nth-child(7), /* 관리권한 */
+#users-table td:nth-child(7) {
+    margin-left: 0;
+}
+
+#users-table th:nth-child(8), /* CSR */
+#users-table td:nth-child(8) {
+    width: 80px;
+    text-align: center;
+    font-weight: bold;
+}
+
+#users-table th:nth-child(9), /* 관리 */
+#users-table td:nth-child(9) {
+    width: 120px;
+    text-align: center;
+    padding: 0;
+}
+
+/* 권한별 색상 */
+#users-table td:nth-child(8)[data-role="0"],
+#users-table td:nth-child(8)[data-role="1"] {
+    color: #e63946;
+}
+
+#users-table td:nth-child(8)[data-role="2"] {
+    color: #fb8500;
+}
+
+#users-table td:nth-child(8)[data-role="3"],
+#users-table td:nth-child(8)[data-role="4"] {
+    color: #4361ee;
+}
+
+#users-table td:nth-child(8)[data-role="5"] {
+    color: #2a9d8f;
+}
+
+/* CSR 값 색상 */
+#users-table td:nth-child(9)[data-csr="1"] {
+    color: #2ecc71;
+}
+
+#users-table td:nth-child(9)[data-csr="0"] {
+    color: #e74c3c;
+}
+
+/* 테이블 반응형 */
+@media (max-width: 768px) {
+    #users-table th,
+    #users-table td {
+        padding: 12px var(--spacing-sm);
+        font-size: var(--font-sm);
+    }
+
+    #users-table th:nth-child(5), /* 직급 */
+    #users-table td:nth-child(5),
+    #users-table th:nth-child(6), /* 직책 */
+    #users-table td:nth-child(6) {
+        width: 80px;
+        padding-left: var(--spacing-sm);
+    }
+
+    #users-table th:nth-child(7), /* 권한 */
+    #users-table td:nth-child(7) {
+        width: 220px;
+        min-width: 220px;
+        white-space: normal !important;
+    }
+}
+
+.user-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: #e1f7e1;
+    color: #2ecc71;
+}
+
+.status-inactive {
+    background-color: #ffe1e1;
+    color: #e74c3c;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1100;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: #fff;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    margin: var(--spacing-xl) auto;
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.submit-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-xl);
+    width: 100%;
+    transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.form-buttons .submit-btn {
+    min-width: 80px;
+}
+
+.form-buttons .delete-btn {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    text-align: center;
+    min-width: 80px;
+    transition: background-color 0.2s ease;
+}
+
+.form-buttons .delete-btn:hover {
+    background-color: var(--danger-hover);
+}
+
+.user-status {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-md);
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: var(--bg-active);
+    color: var(--success-color);
+}
+
+.status-inactive {
+    background-color: var(--bg-inactive);
+    color: var(--danger-color);
+}
+
+/* 테이블 스타일 통합 */
+.main-content {
+    flex: 1;
+    padding: 0 30px 30px 30px;
+    overflow-y: auto;
+}
+
+.table-container {
+    margin-top: 0;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: #fff;
+}
+
+/* =========================
+   테이블 바디에만 스크롤 적용
+   ========================= */
+#users-table {
+    width: 100%;
+    border-collapse: separate;
+    table-layout: fixed;
+}
+
+#users-table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    background-color: var(--bg-light);
+}
+
+#users-table tbody {
+    display: block;
+    max-height: 500px;
+    overflow-y: auto;
+    width: 100%;
+    background-color: var(--bg-light);
+}
+
+@media (min-width: 1200px) {
+    #users-table tbody {
+        max-height: calc(70vh - 60px);
+    }
+}
+
+#users-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    background-color: white;
+}
+
+/* 각 컬럼별 width 명확히 지정 (예시, 실제 컬럼 수에 맞게 조정) */
+#users-table th:nth-child(1), #users-table td:nth-child(1) { width: 5%; }
+#users-table th:nth-child(2), #users-table td:nth-child(2) { width: 10%; }
+#users-table th:nth-child(3), #users-table td:nth-child(3) { width: 18%; }
+#users-table th:nth-child(4), #users-table td:nth-child(4) { width: 13%; }
+#users-table th:nth-child(5), #users-table td:nth-child(5) { width: 8%; }
+#users-table th:nth-child(6), #users-table td:nth-child(6) { width: 8%; }
+#users-table th:nth-child(7), #users-table td:nth-child(7) { width: 15%; }
+#users-table th:nth-child(8), #users-table td:nth-child(8) { width: 10%; }
+#users-table th:nth-child(9), #users-table td:nth-child(9) { width: 8%; }
+
+/* 기존 th, td 스타일은 그대로 유지 */
+#users-table th {
+    padding: 14px var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-md);
+    line-height: 1.5;
+}
+
+#users-table td {
+    padding: 14px var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-md);
+    line-height: 1.5;
+}
+
+#users-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--bg-light);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: var(--font-lg);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+#users-table tbody tr {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+#users-table tbody tr:nth-child(even) {
+    background-color: #fbfdff;
+}
+
+#users-table tbody tr:hover {
+    background-color: var(--bg-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(74, 111, 220, 0.1);
+    border-left: 3px solid var(--text-secondary);
+}
+
+/* 특정 셀 강조 */
+#users-table td:nth-child(2) { /* 이름 */
+    font-weight: 600;
+    color: #1a1f36;
+}
+
+#users-table td:nth-child(3) { /* ID */
+    font-weight: 500;
+    color: #4a6fdc;
+}
+
+/* 권한별 색상 */
+#users-table td:nth-child(8)[data-role="0"],
+#users-table td:nth-child(8)[data-role="1"] {
+    color: var(--danger-color);
+}
+
+#users-table td:nth-child(8)[data-role="2"] {
+    color: var(--warning-color);
+}
+
+#users-table td:nth-child(8)[data-role="3"],
+#users-table td:nth-child(8)[data-role="4"] {
+    color: var(--info-color);
+}
+
+#users-table td:nth-child(8)[data-role="5"] {
+    color: var(--success-color);
+}
+
+/* CSR 값 색상 */
+#users-table td:nth-child(9)[data-csr="1"] {
+    color: var(--success-color);
+}
+
+#users-table td:nth-child(9)[data-csr="0"] {
+    color: var(--danger-color);
+}
+
+/* 페이지네이션 스타일 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    min-width: 32px;
+    height: 32px;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+}
+
+.pagination-btn:hover {
+    background-color: #e2e8f0;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+
+.pagination-btn.active {
+    background-color: #3182F6;
+    color: white;
+    border-color: #3182F6;
+}
+
+.pagination-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    height: 32px;
+    min-width: 20px;
+    font-size: 14px;
+}
+
+.pagination-info {
+    margin-left: 10px;
+    color: #64748b;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 5px;
+}
+
+/* 데이터 없음 메시지 스타일 */
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* 정렬 가능한 컬럼 스타일 */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.sortable:hover {
+    background-color: #e8f0fe !important;
+    color: #1967d2 !important;
+}
+
+.sortable:active {
+    background-color: #d2e3fc !important;
+}
+
+/* 정렬 아이콘 스타일 */
+.sort-icon {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 14px;
+    color: #64748b;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+}
+
+.sortable:hover .sort-icon {
+    color: #1967d2;
+    transform: scale(1.2);
+}
+
+/* 정렬 상태별 아이콘 */
+.sort-icon.default {
+    color: #64748b;
+}
+
+.sort-icon.asc::before {
+    content: '▲';
+    color: #3182F6;
+}
+
+.sort-icon.desc::before {
+    content: '▼';
+    color: #3182F6;
+}
+
+.sort-icon.asc,
+.sort-icon.desc {
+    font-weight: bold;
+}
+
+#users-table td:nth-child(3) {
+    padding-left: -60px;
+}
+
+#users-table th:nth-child(3) {
+    padding-left: -60px;
+}
+
+/* 직급과 직책 셀 스타일 */
+.position-cell, .title-cell {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: -40px;
+}
+
+/* 부서 컬럼 헤더에 대한 스타일 추가 */
+#users-table th.position-cell {
+    background-color: #f4f8ff;
+    font-weight: 600;
+    color: #4a6fdc;
+    font-size: 15px;
+    position: sticky;
+    top: 0;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+    z-index: 1;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.5;
+}
+
+#users-table tbody::-webkit-scrollbar {
+    width: 4px;
+    background-color: transparent;
+}
+
+#users-table tbody::-webkit-scrollbar-thumb {
+    background-color: rgba(74, 111, 220, 0.3);
+    border-radius: var(--radius-sm);
+}
+
+#users-table tbody::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(74, 111, 220, 0.5);
+}
+
+#users-table tbody {
+    scrollbar-width: thin; /* Firefox용, 더 얇게 */
+}
+
+/* 관리권한 필드 비활성화 스타일 */
+select:disabled {
+    background-color: #f5f5f5 !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+    border-color: #d1d3d4;
+}
+
+select:disabled:hover {
+    background-color: #f5f5f5 !important;
+    border-color: #d1d3d4;
+}
+
+/* 관리권한 필드 비활성화 시 라벨 스타일 */
+.form-group:has(select:disabled) label {
+    color: #666666;
+}
+
+.form-group:has(select:disabled) label::after {
+    content: " (수정 불가)";
+    font-size: 12px;
+    color: #999999;
+    font-weight: normal;
+}
+
+/* 비활성화된 버튼 스타일 */
+button:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+    border: 1px solid #999999;
+}
+
+button:disabled:hover {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+}
+
+/* 테이블 행 호버 효과 - role별 구분 */
+.table-container tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-container tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+} 

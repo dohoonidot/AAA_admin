@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>선물보내기 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/gifts.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab active">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="gifts-header">
+                <h2>선물보내기</h2>
+                <div class="search-container">
+                    <input type="text" id="product-search" placeholder="상품을 검색하세요..." class="search-input">
+                    <button id="search-btn" class="search-btn">검색</button>
+                </div>
+            </div>
+            
+            <div class="gifts-content">
+                <!-- 상품 목록 영역 -->
+                <div class="products-section">
+                    <div class="products-grid" id="products-grid">
+                        <!-- 상품들이 동적으로 추가됩니다 -->
+                    </div>
+                    
+                    <!-- 페이지네이션 -->
+                    <div class="pagination-container">
+                        <div class="pagination-controls" id="pagination-controls">
+                            <button id="prev-page" class="pagination-btn">이전</button>
+                            <div class="page-numbers" id="page-numbers"></div>
+                            <button id="next-page" class="pagination-btn">다음</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 선택된 상품 및 수신자 선택 영역 -->
+                <div class="selection-section" id="selection-section" style="display: none;">
+                    <div class="selected-product">
+                        <h3>선택된 상품</h3>
+                        <div class="selected-product-info" id="selected-product-info">
+                            <!-- 선택된 상품 정보가 표시됩니다 -->
+                        </div>
+                        <div class="selected-product-details" id="selected-product-details">
+                            <!-- 선택된 상품 상세 정보가 표시됩니다 -->
+                        </div>
+                    </div>
+                    
+                    <div class="recipients-section">
+                        <h3>받는 사람 선택</h3>
+                        <div class="organization-tree">
+                            <!-- 조직도 트리가 표시됩니다 -->
+                            <div class="tree-container" id="tree-container">
+                                <!-- 부서별 조직도가 동적으로 생성됩니다 -->
+                            </div>
+                        </div>
+                        
+                        <div class="selected-recipients">
+                            <h4>선택된 받는 사람 (<span id="selected-count">0</span>명)</h4>
+                            <div class="recipients-list" id="recipients-list">
+                                <!-- 선택된 사람들이 표시됩니다 -->
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button id="send-gift-btn" class="send-btn" disabled>선물 보내기</button>
+                            <button id="cancel-btn" class="cancel-btn">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상품 상세 모달 -->
+    <div id="product-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>상품 상세 정보</h2>
+                <span class="close" onclick="closeProductDetailModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail-container" id="product-detail-container">
+                    <!-- 상품 상세 정보가 표시됩니다 -->
+                </div>
+                <div class="modal-actions">
+                    <button id="select-product-btn" class="select-btn">이 상품 선택</button>
+                    <button onclick="closeProductDetailModal()" class="cancel-btn">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 유틸리티 스크립트 먼저 로드 -->
+    <script src="../js/utils/auth.js"></script>
+    <script src="../js/utils/api.js"></script>
+    <script src="../js/utils/debug.js"></script>
+    <!-- 메인 스크립트들 -->
+    <script src="../js/main.js"></script>
+    <script src="../js/gifts.js"></script>
+    <script>
+        // AuthManager가 로드되었는지 확인
+        if (typeof AuthManager === 'undefined') {
+            console.error('❌ AuthManager가 로드되지 않았습니다.');
+        } else {
+            console.log('✅ AuthManager 로드 완료');
+        }
+        
+        // 페이지 로드 완료 후 디버깅 정보 출력
+        console.log('🎁 gifts.html 페이지 로드 완료');
+        console.log('📍 현재 URL:', window.location.href);
+        console.log('📁 현재 경로:', window.location.pathname);
+        
+        // 페이지 로드 시 권한별 메뉴 제어
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+        });
+    </script>
+</body>
+</html> 

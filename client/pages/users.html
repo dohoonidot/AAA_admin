@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 관리 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/users.css">
+    <style>
+        /* 권한 레벨별 색상 */
+        .role-0 { color: #FF0000; font-weight: bold; } /* 최고관리자 - 빨간색 */
+        .role-1 { color: #FF6B6B; font-weight: bold; } /* 관리자_1 - 연한 빨간색 */
+        .role-2 { color: #FFA500; } /* 관리자_2 - 주황색 */
+        .role-3 { color: #4CAF50; } /* 본부장 - 초록색 */
+        .role-4 { color: #2196F3; } /* 사업부장 - 파란색 */
+        .role-5 { color: #9E9E9E; } /* 일반위원 - 회색 */
+
+        /* CSR 레벨별 색상 */
+        .csr-1 { color: #4CAF50; font-weight: bold; } /* 모든 CSR 검색 가능 - 초록색 */
+        .csr-0 { color: #9E9E9E; } /* 본인 CSR 검색 가능 - 회색 */
+
+        /* 직급과 직책 컬럼 스타일 */
+        .position-cell, .title-cell {
+            width: 80px;
+            min-width: 80px;
+            max-width: 80px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 관리권한 컬럼 스타일 */
+        .admin-role-cell {
+            width: 100px;
+            min-width: 100px;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .admin-role-0 { color: #FF0000; font-weight: bold; } /* 최고관리자 */
+        .admin-role-1 { color: #FF6B6B; font-weight: bold; } /* 관리자_1 */
+        .admin-role-2 { color: #FFA500; } /* 관리자_2 */
+        .admin-role-3 { color: #4CAF50; } /* 본부장 */
+        .admin-role-4 { color: #2196F3; } /* 사업부장 */
+        .admin-role-5 { color: #9E9E9E; } /* 일반위원 */
+
+        /* 관리권한 필터 스타일 */
+        #admin-role-filter {
+            padding: 6px;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            background-color: white;
+            height: 36px;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            min-width: 140px;
+            max-width: 140px;
+            white-space: nowrap;
+        }
+
+        #admin-role-filter option {
+            white-space: nowrap;
+        }
+
+        #admin-role-filter:focus {
+            outline: none;
+            border-color: #3182F6;
+            box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1);
+        }
+
+        /* 읽기 전용 입력 필드 스타일 */
+        input[readonly] {
+            background-color: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+            border: 1px solid #ddd;
+        }
+        
+        input[readonly]:focus {
+            outline: none;
+            border-color: #ddd;
+            box-shadow: none;
+        }
+
+        /* 부서 직접 입력 관련 스타일 */
+        .department-input-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        .department-input-container select,
+        .department-input-container input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .department-input-container input {
+            display: none; /* 기본적으로 숨김 */
+        }
+        
+        .department-input-container input.active {
+            display: block;
+        }
+        
+        .department-input-container select.hidden {
+            display: none;
+        }
+        
+        .department-direct-input-btn {
+            margin-top: 5px;
+            padding: 6px 12px;
+            background-color: #3182F6;
+            border: 1px solid #3182F6;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: white;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+        
+        .department-direct-input-btn:hover {
+            background-color: #2167d8;
+            border-color: #2167d8;
+        }
+        
+        .department-direct-input-btn:active {
+            background-color: #1d5aa0;
+            transform: translateY(1px);
+        }
+
+        /* 페이지네이션 정보 스타일 추가 */
+        .pagination-info {
+            margin-left: 20px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .page-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .current-page {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .data-range {
+            color: #666;
+        }
+        
+        /* 페이지네이션 컨테이너 스타일 수정 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 10px;
+            gap: 8px;
+        }
+        
+        .pagination-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+        }
+        
+        .pagination-btn.active {
+            background-color: #3182F6;
+            color: white;
+            border-color: #3182F6;
+        }
+        
+        .pagination-btn:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .pagination-ellipsis {
+            padding: 0 8px;
+            color: #666;
+        }
+        
+        /* 수정 가능한 행과 불가능한 행 스타일 */
+        .editable-row:hover {
+            background-color: #f0f8ff !important;
+            transition: background-color 0.2s ease;
+        }
+
+        .non-editable-row {
+            opacity: 0.6;
+        }
+
+        .non-editable-row:hover {
+            background-color: #f5f5f5 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown active">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item active">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                    </div>
+                </div>
+                <!-- <a href="reports.html" class="sidebar-tab">보고서</a> -->
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="user-controls">
+                <div class="filter-controls">
+                    <div class="search-container">
+                        <input type="text" id="user-search" placeholder="사용자 검색...">
+                        <button class="search-button" id="search-user">검색</button>
+                    </div>
+                    <div class="filter-container">
+                        <select id="department-filter">
+                            <option value="all">전체 부서</option>
+                            <option value="경영관리실">경영관리실</option>
+                            <option value="New Tech사업부">New Tech사업부</option>
+                            <option value="솔루션사업부">솔루션사업부</option>
+                            <option value="FCM사업부">FCM사업부</option>
+                            <option value="SCM사업부">SCM사업부</option>
+                            <option value="Innovation Center">Innovation Center</option>
+                            <option value="Biz AI사업부">Biz AI사업부</option>
+                            <option value="HRS사업부">HRS사업부</option>
+                            <option value="DTE본부">DTE본부</option>
+                            <option value="남부지사">남부지사</option>
+                            <option value="중국지사">중국지사</option>
+                            <option value="PUBLIC CLOUD사업부">PUBLIC CLOUD사업부</option>
+                            <option value="ITS사업부">ITS사업부</option>
+                            <option value="BAC사업부">BAC사업부</option>
+                            <option value="BDS사업부">BDS사업부</option>
+                            <option value="NGE본부">NGE본부</option>
+                            <option value="대표이사">대표이사</option>
+                        </select>
+                        <select id="position-filter">
+                            <option value="all">전체 직급</option>
+                            <option value="인턴">인턴</option>
+                            <option value="위원">위원</option>
+                            <option value="상무">상무</option>
+                            <option value="전문이사">전문이사</option>
+                            <option value="전무">전무</option>
+                            <option value="부사장">부사장</option>
+                            <option value="대표">대표</option>
+                        </select>
+                        <select id="title-filter">
+                            <option value="all">전체 직책</option>
+                            <option value="팀원">팀원</option>
+                            <option value="팀장">팀장</option>
+                            <option value="실장">실장</option>
+                            <option value="사업부장">사업부장</option>
+                            <option value="본부장">본부장</option>
+                            <option value="부사장">부사장</option>
+                            <option value="대표이사">대표이사</option>
+                        </select>
+                        <select id="admin-role-filter">
+                            <option value="all">전체 관리권한</option>
+                            <option value="0">0 : 최고관리자</option>
+                            <option value="1">1 : 관리자_1</option>
+                            <option value="2">2 : 관리자_2</option>
+                            <option value="3">3 : 본부장</option>
+                            <option value="4">4 : 사업부장</option>
+                            <option value="5">5 : 일반위원</option>
+                        </select>
+                        <select id="role-filter">
+                            <option value="all">전체 AAA 정보 조회권한</option>
+                            <option value="0">0 : 최고관리자</option>
+                            <option value="1">1 : 관리자_1</option>
+                            <option value="2">2 : 관리자_2</option>
+                            <option value="3">3 : 본부장</option>
+                            <option value="4">4 : 사업부장</option>
+                            <option value="5">5 : 일반위원</option>
+                        </select>
+                        <select id="csr-filter">
+                            <option value="all">전체 CSR</option>
+                            <option value="0">0 : 본인 CSR 검색 가능</option>
+                            <option value="1">1 : 모든 CSR 검색 가능</option>
+                        </select>
+                        <button type="button" id="apply-filter" class="filter-button">필터적용</button>
+                        <button type="button" id="clear-filter" class="filter-button">필터제거</button>
+                    </div>
+                </div>
+                <button id="add-user">새 사용자 추가</button>
+            </div>
+            <!-- 활성 필터 태그 표시 영역을 테이블 위로 이동 -->
+            <div id="active-filters" class="active-filters"></div>
+            <div class="table-container">
+                <table id="users-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th id="name-header" class="sortable">
+                                이름
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th>ID</th>
+                            <!-- <th>비밀번호</th> -->
+                            <th class="position-cell">부서</th>
+                            <th class="position-cell">직급</th>
+                            <th class="title-cell">직책</th>
+                            <th class="admin-role-cell">관리권한</th>
+                            <th class="role-cell">
+                                AAA 정보 조회권한
+                                <div class="role-tooltip">
+                                    <div><strong>권한 설명</strong></div>
+                                    <div>0 : 최고관리자 - 모든 데이터 열람 가능, 모든 기능 사용 가능, user 권한 부여 가능, 휴가 총괄 관리 화면 접근 가능</div>
+                                    <div>1 : 관리자_1 - 전체회원 관리권한, user 권한부여 제외 모든 기능 가능, 휴가 총괄 관리 화면 접근 가능</div>
+                                    <div>2 : 관리자_2 - 전체회원 관리권한</div>
+                                    <div>3 : 본부장 - 해당 본부의 모든 데이터 열람 가능</div>
+                                    <div>4 : 사업부장 - 해당 사업부의 모든 데이터 열람 가능</div>
+                                    <div>5 : 일반위원 - 본인이 담당하는 CSR 및 본인 인사정보 열람 가능</div>
+                                </div>
+                            </th>
+                            <th class="csr-cell">
+                                CSR
+                                <div class="csr-tooltip">
+                                    <div><strong>CSR 설명</strong></div>
+                                    <div>1 : 모든 CSR 검색 가능</div>
+                                    <div>0 : 본인 CSR 검색 가능</div>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 사용자 데이터가 여기에 동적으로 추가됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 페이지네이션 컨트롤 추가 -->
+            <div class="pagination" id="pagination">
+                <!-- 페이지네이션 버튼들이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 사용자 추가 모달 -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>새 사용자 추가</h2>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label for="user-name">이름</label>
+                    <input type="text" id="user-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-id">ID</label>
+                    <input type="text" id="user-id" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-join-date">입사일자</label>
+                    <input type="date" id="user-join-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-department">부서</label>
+                    <div class="department-input-container">
+                        <select id="user-department" required>
+                            <option value="">부서 선택</option>
+                            <option value="경영관리실">경영관리실</option>
+                            <option value="New Tech사업부">New Tech사업부</option>
+                            <option value="솔루션사업부">솔루션사업부</option>
+                            <option value="FCM사업부">FCM사업부</option>
+                            <option value="SCM사업부">SCM사업부</option>
+                            <option value="Innovation Center">Innovation Center</option>
+                            <option value="Biz AI사업부">Biz AI사업부</option>
+                            <option value="HRS사업부">HRS사업부</option>
+                            <option value="DTE본부">DTE본부</option>
+                            <option value="남부지사">남부지사</option>
+                            <option value="중국지사">중국지사</option>
+                            <option value="PUBLIC CLOUD사업부">PUBLIC CLOUD사업부</option>
+                            <option value="ITS사업부">ITS사업부</option>
+                            <option value="BAC사업부">BAC사업부</option>
+                            <option value="BDS사업부">BDS사업부</option>
+                            <option value="NGE본부">NGE본부</option>
+                            <option value="대표이사">대표이사</option>
+                        </select>
+                        <input type="text" id="user-department-direct" placeholder="부서 직접 입력">
+                        <button type="button" class="department-direct-input-btn" onclick="toggleAddDepartmentInput()">직접 입력</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="user-position">직급</label>
+                    <select id="user-position" required>
+                        <option value="인턴">인턴</option>
+                        <option value="위원">위원</option>
+                        <option value="상무">상무</option>
+                        <option value="전문이사">전문이사</option>
+                        <option value="전무">전무</option>
+                        <option value="부사장">부사장</option>
+                        <option value="대표">대표</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-title">직책</label>
+                    <select id="user-title" required>
+                        <option value="팀원">팀원</option>
+                        <option value="팀장">팀장</option>
+                        <option value="실장">실장</option>
+                        <option value="사업부장">사업부장</option>
+                        <option value="본부장">본부장</option>
+                        <option value="부사장">부사장</option>
+                        <option value="대표이사">대표이사</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-admin-role">관리권한</label>
+                    <select id="user-admin-role" required>
+                        <option value="5">5 : 일반위원</option>
+                        <option value="4">4 : 사업부장</option>
+                        <option value="3">3 : 본부장</option>
+                        <option value="2">2 : 관리자_2</option>
+                        <option value="1">1 : 관리자_1</option>
+                        <option value="0">0 : 최고관리자</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-role">AAA 정보 조회권한</label>
+                    <select id="user-role" required>
+                        <option value="5">5 : 일반위원</option>
+                        <option value="4">4 : 사업부장</option>
+                        <option value="3">3 : 본부장</option>
+                        <option value="2">2 : 관리자_2</option>
+                        <option value="1">1 : 관리자_1</option>
+                        <option value="0">0 : 최고관리자</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-csr">CSR</label>
+                    <select id="user-csr" required>
+                        <option value="0">0 : 본인 CSR 검색 가능</option>
+                        <option value="1">1 : 모든 CSR 검색 가능</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">추가</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 사용자 수정 모달 -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>사용자 정보 수정</h2>
+            <form id="edit-user-form">
+                <input type="hidden" id="edit-user-id">
+                <div class="form-group">
+                    <label for="edit-user-name">이름</label>
+                    <input type="text" id="edit-user-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-login-id">ID</label>
+                    <input type="text" id="edit-user-login-id" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-department">부서</label>
+                    <div class="department-input-container">
+                        <select id="edit-user-department" required>
+                            <option value="">부서 선택</option>
+                            <option value="경영관리실">경영관리실</option>
+                            <option value="New Tech사업부">New Tech사업부</option>
+                            <option value="솔루션사업부">솔루션사업부</option>
+                            <option value="FCM사업부">FCM사업부</option>
+                            <option value="SCM사업부">SCM사업부</option>
+                            <option value="Innovation Center">Innovation Center</option>
+                            <option value="Biz AI사업부">Biz AI사업부</option>
+                            <option value="HRS사업부">HRS사업부</option>
+                            <option value="DTE본부">DTE본부</option>
+                            <option value="남부지사">남부지사</option>
+                            <option value="중국지사">중국지사</option>
+                            <option value="PUBLIC CLOUD사업부">PUBLIC CLOUD사업부</option>
+                            <option value="ITS사업부">ITS사업부</option>
+                            <option value="BAC사업부">BAC사업부</option>
+                            <option value="BDS사업부">BDS사업부</option>
+                            <option value="NGE본부">NGE본부</option>
+                            <option value="대표이사">대표이사</option>
+                        </select>
+                        <input type="text" id="edit-user-department-direct" placeholder="부서 직접 입력">
+                        <button type="button" class="department-direct-input-btn" onclick="toggleDepartmentInput()">직접 입력</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-position">직급</label>
+                    <select id="edit-user-position" required>
+                        <option value="인턴">인턴</option>
+                        <option value="위원">위원</option>
+                        <option value="상무">상무</option>
+                        <option value="전문이사">전문이사</option>
+                        <option value="전무">전무</option>
+                        <option value="부사장">부사장</option>
+                        <option value="대표">대표</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-title">직책</label>
+                    <select id="edit-user-title" required>
+                        <option value="팀원">팀원</option>
+                        <option value="팀장">팀장</option>
+                        <option value="실장">실장</option>
+                        <option value="사업부장">사업부장</option>
+                        <option value="본부장">본부장</option>
+                        <option value="부사장">부사장</option>
+                        <option value="대표이사">대표이사</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-admin-role">관리권한</label>
+                    <select id="edit-user-admin-role" required>
+                        <option value="5">5 : 일반위원</option>
+                        <option value="4">4 : 사업부장</option>
+                        <option value="3">3 : 본부장</option>
+                        <option value="2">2 : 관리자_2</option>
+                        <option value="1">1 : 관리자_1</option>
+                        <option value="0">0 : 최고관리자</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-role">AAA 정보 조회권한</label>
+                    <select id="edit-user-role" required>
+                        <option value="5">5 : 일반위원</option>
+                        <option value="4">4 : 사업부장</option>
+                        <option value="3">3 : 본부장</option>
+                        <option value="2">2 : 관리자_2</option>
+                        <option value="1">1 : 관리자_1</option>
+                        <option value="0">0 : 최고관리자</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-csr">CSR</label>
+                    <select id="edit-user-csr" required>
+                        <option value="0">0 : 본인 CSR 검색 가능</option>
+                        <option value="1">1 : 모든 CSR 검색 가능</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-is-worked">재직여부</label>
+                    <select id="edit-user-is-worked" required>
+                        <option value="0">재직</option>
+                        <option value="1">퇴사</option>
+                    </select>
+                </div>
+                <div class="form-group" id="resign-date-group" style="display: none;">
+                    <label for="edit-user-resign-date">퇴사일자</label>
+                    <input type="date" id="edit-user-resign-date">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">수정</button>
+                    <button type="button" class="btn-danger" onclick="showDeleteConfirm()">삭제</button>
+                    <button type="button" class="btn-reset-password" onclick="resetPassword()" style="margin-left: auto;">비밀번호 초기화</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="delete-confirm-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>사용자 삭제</h2>
+            <p>사용자를 삭제하기 위해 관리자 아이디와 비밀번호를 입력해주세요.</p>
+            <form id="delete-confirm-form">
+                <input type="hidden" id="delete-user-id">
+                <input type="hidden" id="delete-user-name">
+                <div class="form-group">
+                    <label for="admin-id">관리자 아이디</label>
+                    <input type="text" id="admin-id" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">관리자 비밀번호</label>
+                    <input type="password" id="admin-password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-danger">삭제</button>
+                    <button type="button" class="btn-secondary" onclick="closeDeleteConfirm()">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script src="../js/users.js"></script>
+    <script>
+        // 테이블 행 클릭 이벤트 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            // 권한별 메뉴 제어
+            controlSidebarMenus();
+            
+            const usersTable = document.getElementById('users-table');
+            if (usersTable) {
+                usersTable.addEventListener('click', async function(e) {
+                    const target = e.target.closest('tr');
+                    if (target && target.parentNode.tagName === 'TBODY') {
+                        const userId = target.dataset.userId;
+                        if (userId) {
+                            // 수정 권한 확인
+                            if (target.classList.contains('editable-row')) {
+                                editUser(userId);
+                            } else {
+                                // 권한이 없는 경우 메시지 표시
+                                const currentAdminRole = localStorage.getItem('adminRole');
+                                if (currentAdminRole === '5') {
+                                    alert('사용자 정보를 수정할 권한이 없습니다.');
+                                } else if (['3', '4'].includes(currentAdminRole)) {
+                                    alert('같은 부서의 사용자만 수정할 수 있습니다.');
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

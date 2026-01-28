@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연차촉진관리 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/vacation-admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown active">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item active" style="display: none;">연차촉진관리</a>
+                        <a href="vacation-approval-history.html" class="sidebar-dropdown-item">휴가신청승인 관리</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1>연차촉진관리</h1>
+                <p class="subtitle">미사용 연차가 많은 직원에게 휴가 사용을 촉진할 수 있습니다</p>
+            </div>
+
+            <!-- 통계 카드 -->
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px;">
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <h3>촉진 대상</h3>
+                        <p class="stat-number" id="promotion-target">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📧</div>
+                    <div class="stat-content">
+                        <h3>알림 발송</h3>
+                        <p class="stat-number" id="notification-sent">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <h3>사용 완료</h3>
+                        <p class="stat-number" id="vacation-completed">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <h3>평균 미사용</h3>
+                        <p class="stat-number" id="avg-unused">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 필터 섹션 -->
+            <div class="filter-section">
+                <div class="filter-card">
+                    <div class="filter-group">
+                        <label>부서</label>
+                        <select id="department-filter" class="filter-select">
+                            <option value="">전체</option>
+                            <option value="경영관리실">경영관리실</option>
+                            <option value="New Tech사업부">New Tech사업부</option>
+                            <option value="솔루션사업부">솔루션사업부</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>잔여일수</label>
+                        <select id="remaining-filter" class="filter-select">
+                            <option value="">전체</option>
+                            <option value="10">10일 이상</option>
+                            <option value="15">15일 이상</option>
+                            <option value="20">20일 이상</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>알림상태</label>
+                        <select id="status-filter" class="filter-select">
+                            <option value="">전체</option>
+                            <option value="notified">발송완료</option>
+                            <option value="pending">미발송</option>
+                        </select>
+                    </div>
+                    <button id="refresh-btn" class="refresh-btn">새로고침</button>
+                </div>
+            </div>
+
+            <!-- 일괄 알림 발송 -->
+            <div class="filter-section">
+                <div class="filter-card" style="padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin: 0 0 5px 0; color: #856404;">연차 촉진 알림</h3>
+                            <p style="margin: 0; color: #856404; font-size: 14px;">선택한 직원들에게 연차 사용 촉진 알림을 발송합니다</p>
+                        </div>
+                        <button id="send-notification-btn" class="action-btn approve" style="padding: 12px 30px;">
+                            선택 직원 알림 발송
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 촉진 대상 직원 목록 -->
+            <div class="page-header" style="margin-top: 20px;">
+                <h2>촉진 대상 직원 (<span id="target-count">0</span>명)</h2>
+            </div>
+
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="select-all"></th>
+                            <th>No.</th>
+                            <th>이름</th>
+                            <th>부서</th>
+                            <th>직급</th>
+                            <th>총연차</th>
+                            <th>잔여</th>
+                            <th>소멸예정</th>
+                            <th>최근알림</th>
+                            <th>알림횟수</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promotion-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 알림 발송 모달 -->
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>연차 촉진 알림 발송</h3>
+                <button class="close-btn" onclick="closeNotificationModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="notification-message"></p>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>알림 메시지 (선택사항)</label>
+                    <textarea id="custom-message" class="filter-select" rows="4" placeholder="추가 메시지가 있다면 입력하세요. (기본 메시지에 추가됩니다)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeNotificationModal()">취소</button>
+                <button id="confirm-send-btn" class="modal-btn confirm">발송</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script>
+        let selectedEmployees = [];
+        let employees = [
+            {id: 1, name: '김철수', dept: '경영관리실', position: '대리', total: 15, remaining: 12, expiring: 5, lastNotified: '2024-11-15', notifyCount: 2, status: 'notified'},
+            {id: 2, name: '이영희', dept: 'New Tech사업부', position: '과장', total: 15, remaining: 14, expiring: 8, lastNotified: null, notifyCount: 0, status: 'pending'},
+            {id: 3, name: '박민수', dept: '솔루션사업부', position: '차장', total: 20, remaining: 18, expiring: 10, lastNotified: '2024-11-20', notifyCount: 3, status: 'notified'},
+            {id: 4, name: '정수진', dept: '경영관리실', position: '사원', total: 15, remaining: 15, expiring: 7, lastNotified: null, notifyCount: 0, status: 'pending'},
+            {id: 5, name: '최민호', dept: 'New Tech사업부', position: '대리', total: 15, remaining: 11, expiring: 6, lastNotified: '2024-11-10', notifyCount: 1, status: 'notified'}
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+            renderEmployees();
+            updateStatistics();
+
+            document.getElementById('select-all').addEventListener('change', toggleSelectAll);
+            document.getElementById('send-notification-btn').addEventListener('click', openNotificationModal);
+            document.getElementById('confirm-send-btn').addEventListener('click', sendNotifications);
+
+            // 필터 이벤트
+            document.getElementById('department-filter').addEventListener('change', applyFilters);
+            document.getElementById('remaining-filter').addEventListener('change', applyFilters);
+            document.getElementById('status-filter').addEventListener('change', applyFilters);
+            document.getElementById('refresh-btn').addEventListener('click', () => {
+                document.getElementById('department-filter').value = '';
+                document.getElementById('remaining-filter').value = '';
+                document.getElementById('status-filter').value = '';
+                applyFilters();
+            });
+        });
+
+        function renderEmployees(filteredData = null) {
+            const data = filteredData || employees;
+            const tbody = document.getElementById('promotion-tbody');
+
+            tbody.innerHTML = data.map((emp, idx) => `
+                <tr>
+                    <td><input type="checkbox" class="employee-checkbox" data-id="${emp.id}"></td>
+                    <td>${idx + 1}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.dept}</td>
+                    <td>${emp.position}</td>
+                    <td>${emp.total}일</td>
+                    <td><span style="color: #dc3545; font-weight: bold;">${emp.remaining}일</span></td>
+                    <td><span style="color: #ff6b6b; font-weight: bold;">${emp.expiring}일</span></td>
+                    <td>${emp.lastNotified || '-'}</td>
+                    <td>${emp.notifyCount}회</td>
+                    <td>
+                        <button class="action-btn approve" onclick="sendSingleNotification(${emp.id})" style="padding: 5px 15px; font-size: 13px;">
+                            알림발송
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('target-count').textContent = data.length;
+
+            // 체크박스 이벤트 리스너 추가
+            document.querySelectorAll('.employee-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedEmployees);
+            });
+        }
+
+        function updateStatistics() {
+            const promotionTarget = employees.filter(e => e.remaining >= 10).length;
+            const notificationSent = employees.reduce((sum, e) => sum + e.notifyCount, 0);
+            const vacationCompleted = employees.filter(e => e.remaining < 5).length;
+            const avgUnused = (employees.reduce((sum, e) => sum + e.remaining, 0) / employees.length).toFixed(1);
+
+            document.getElementById('promotion-target').textContent = promotionTarget + '명';
+            document.getElementById('notification-sent').textContent = notificationSent + '회';
+            document.getElementById('vacation-completed').textContent = vacationCompleted + '명';
+            document.getElementById('avg-unused').textContent = avgUnused + '일';
+        }
+
+        function toggleSelectAll(e) {
+            const checkboxes = document.querySelectorAll('.employee-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+            updateSelectedEmployees();
+        }
+
+        function updateSelectedEmployees() {
+            selectedEmployees = Array.from(document.querySelectorAll('.employee-checkbox:checked'))
+                .map(cb => parseInt(cb.dataset.id));
+        }
+
+        function openNotificationModal() {
+            if (selectedEmployees.length === 0) {
+                alert('알림을 발송할 직원을 선택해주세요.');
+                return;
+            }
+
+            const selectedNames = employees
+                .filter(e => selectedEmployees.includes(e.id))
+                .map(e => e.name)
+                .join(', ');
+
+            document.getElementById('notification-message').textContent =
+                `선택한 ${selectedEmployees.length}명의 직원에게 연차 촉진 알림을 발송하시겠습니까?\n\n대상: ${selectedNames}`;
+            document.getElementById('notification-modal').style.display = 'flex';
+        }
+
+        function closeNotificationModal() {
+            document.getElementById('notification-modal').style.display = 'none';
+            document.getElementById('custom-message').value = '';
+        }
+
+        function sendNotifications() {
+            const customMessage = document.getElementById('custom-message').value;
+
+            // API 호출 위치
+            // const response = await fetch('/api/vacation/send-promotion-notification', {
+            //     method: 'POST',
+            //     body: JSON.stringify({ employeeIds: selectedEmployees, customMessage })
+            // });
+
+            alert(`${selectedEmployees.length}명에게 연차 촉진 알림이 발송되었습니다.`);
+
+            // 발송 후 데이터 업데이트
+            const today = new Date().toISOString().split('T')[0];
+            employees.forEach(emp => {
+                if (selectedEmployees.includes(emp.id)) {
+                    emp.lastNotified = today;
+                    emp.notifyCount += 1;
+                    emp.status = 'notified';
+                }
+            });
+
+            renderEmployees();
+            updateStatistics();
+            closeNotificationModal();
+
+            // 선택 초기화
+            document.getElementById('select-all').checked = false;
+            selectedEmployees = [];
+        }
+
+        function sendSingleNotification(employeeId) {
+            const employee = employees.find(e => e.id === employeeId);
+
+            if (confirm(`${employee.name}에게 연차 촉진 알림을 발송하시겠습니까?`)) {
+                // API 호출 위치
+                alert('알림이 발송되었습니다.');
+
+                const today = new Date().toISOString().split('T')[0];
+                employee.lastNotified = today;
+                employee.notifyCount += 1;
+                employee.status = 'notified';
+
+                renderEmployees();
+                updateStatistics();
+            }
+        }
+
+        function applyFilters() {
+            const deptFilter = document.getElementById('department-filter').value;
+            const remainingFilter = document.getElementById('remaining-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            let filtered = employees;
+
+            if (deptFilter) {
+                filtered = filtered.filter(e => e.dept === deptFilter);
+            }
+
+            if (remainingFilter) {
+                const threshold = parseInt(remainingFilter);
+                filtered = filtered.filter(e => e.remaining >= threshold);
+            }
+
+            if (statusFilter) {
+                filtered = filtered.filter(e => e.status === statusFilter);
+            }
+
+            renderEmployees(filtered);
+        }
+    </script>
+</body>
+</html>

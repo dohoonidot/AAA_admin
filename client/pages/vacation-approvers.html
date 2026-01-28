@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>권한관리자 지정 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/vacation-admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown active">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item active">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                        <a href="vacation-approval-history.html" class="sidebar-dropdown-item">휴가신청승인 관리</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1>권한관리자 지정</h1>
+                <p class="subtitle">AAA 승인자 명단을 관리할 수 있습니다 (추가/제거)</p>
+            </div>
+
+            <!-- 버튼 영역 (상단 고정) -->
+            <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 12px;">
+                <button id="move-to-approver-btn" class="action-btn approve" style="padding: 10px 20px; white-space: nowrap; font-size: 13px;">
+                    승인자로 이동 →
+                </button>
+                <button id="remove-from-approver-btn" class="action-btn reject" style="padding: 10px 20px; white-space: nowrap; font-size: 13px;">
+                    ← 승인자 제거
+                </button>
+            </div>
+
+            <!-- 두 영역 레이아웃 -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: calc(100vh - 220px);">
+                <!-- 왼쪽: 사내 조직도 -->
+                <div style="display: flex; flex-direction: column;">
+                    <h3 style="margin-bottom: 4px; font-size: 14px; font-weight: 600; color: #191f28;">사내 조직도</h3>
+                    <div class="filter-card" style="padding: 6px; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                        <!-- 부서 / 인원 좌우 분할 영역 -->
+                        <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #e5e7eb; border-radius: 4px; overflow: hidden;">
+                            <!-- 왼쪽 50%: 부서 목록 -->
+                            <div style="border-right: 1px solid #e5e7eb; overflow-y: auto; background-color: #ffffff;">
+                                <ul id="department-list-inner" style="list-style: none; margin: 0; padding: 0;">
+                                    <li style="padding: 8px; text-align: center; color: #9ca3af; font-size: 12px;">
+                                        부서 목록을 불러오는 중...
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- 오른쪽 50%: 부서원 목록 -->
+                            <div style="overflow-y: auto; background-color: #fafafa;">
+                                <div id="members-area">
+                                    <div style="padding: 20px 10px; text-align: center; color: #9ca3af; font-size: 12px;">
+                                        부서를 선택하세요
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 승인자 목록 -->
+                <div style="display: flex; flex-direction: column;">
+                    <h3 style="margin-bottom: 4px; font-size: 14px; font-weight: 600; color: #191f28;">승인자 목록 (<span id="approver-count">0</span>명)</h3>
+                    <div class="filter-card" style="padding: 6px; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                        <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 4px;">
+                            <table class="history-table" style="margin: 0; width: 100%;">
+                                <thead style="position: sticky; top: 0; background-color: #f9fafb; z-index: 1;">
+                                    <tr>
+                                        <th style="width: 36px; padding: 6px 4px;">
+                                            <input type="checkbox" id="select-all-approvers">
+                                        </th>
+                                        <th style="padding: 6px 4px; font-size: 12px;">이름</th>
+                                        <th style="padding: 6px 4px; font-size: 12px;">직급</th>
+                                        <th style="padding: 6px 4px; font-size: 12px;">부서</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="approvers-tbody">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
+                                            등록된 승인자가 없습니다
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 제거 확인 모달 -->
+    <div id="remove-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>승인자 권한 제거</h3>
+                <button class="close-btn" onclick="closeRemoveModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="remove-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeRemoveModal()">취소</button>
+                <button id="confirm-remove-btn" class="modal-btn confirm">제거</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script>
+        let approvers = [];
+        let departments = [];
+        let currentMembers = [];
+        let selectedDepartment = '';
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            controlSidebarMenus();
+
+            // admin@aspnc.com 또는 test_hne@aspnc.com 계정인지 확인
+            const adminId = localStorage.getItem('userId');
+            const isAdmin = adminId === 'admin@aspnc.com';
+            const isTestUser = adminId === 'test_hne@aspnc.com';
+            
+            if (!isAdmin && !isTestUser) {
+                alert('이 기능은 admin@aspnc.com 또는 test_hne@aspnc.com 계정만 사용할 수 있습니다.');
+                window.location.href = '../index.html';
+                return;
+            }
+
+            await loadDepartments();
+            await loadApprovers();
+
+            // 이벤트 리스너 설정
+            const deptList = document.getElementById('department-list-inner');
+            if (deptList) {
+                deptList.addEventListener('click', onDepartmentClick);
+            }
+
+            const moveBtn = document.getElementById('move-to-approver-btn');
+            if (moveBtn) {
+                moveBtn.addEventListener('click', moveToApprover);
+            }
+
+            const removeBtn = document.getElementById('remove-from-approver-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', removeFromApprover);
+            }
+
+            const selectAllApprovers = document.getElementById('select-all-approvers');
+            if (selectAllApprovers) {
+                selectAllApprovers.addEventListener('change', toggleAllApprovers);
+            }
+        });
+
+        // 부서 목록 로드
+        async function loadDepartments() {
+            try {
+                console.log('부서 목록 조회 시작...');
+
+                const response = await fetch('/api/getDepartmentList');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('부서 목록 응답:', data);
+
+                departments = data.departments || [];
+
+                // 사내 조직도 영역에 부서 목록 표시
+                const list = document.getElementById('department-list-inner');
+                if (list) {
+                    if (departments.length === 0) {
+                        list.innerHTML = '<li style="padding: 10px; text-align: center; color: #9ca3af;">등록된 부서가 없습니다.</li>';
+                    } else {
+                        list.innerHTML = departments.map(dept => `
+                            <li class="department-item" data-dept="${dept}"
+                                style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #e5e7eb; background-color: #ffffff; transition: background-color 0.15s;">
+                                <span style="font-weight: 500; font-size: 14px;">${dept}</span>
+                            </li>
+                        `).join('');
+                    }
+                }
+
+                console.log('부서 목록 로드 완료:', departments.length);
+            } catch (error) {
+                console.error('부서 목록 로드 실패:', error);
+                alert('부서 목록을 불러오는데 실패했습니다.');
+            }
+        }
+
+        // 부서 클릭 시 부서원 로드
+        async function onDepartmentClick(e) {
+            const item = e.target.closest('.department-item');
+            if (!item) return;
+
+            const department = item.getAttribute('data-dept');
+            selectedDepartment = department;
+
+            if (!department) {
+                return;
+            }
+
+            // 다른 부서들의 하이라이트 제거
+            const allItems = document.querySelectorAll('.department-item');
+            allItems.forEach(li => {
+                li.style.backgroundColor = '#ffffff';
+            });
+
+            // 선택된 부서 하이라이트
+            item.style.backgroundColor = '#e0f2fe';
+
+            try {
+                console.log('부서원 조회 시작:', department);
+
+                // 오른쪽 영역 로딩 표시
+                const membersArea = document.getElementById('members-area');
+                membersArea.innerHTML = '<div style="padding: 40px 20px; text-align: center; color: #9ca3af; font-size: 13px;">불러오는 중...</div>';
+
+                // 실제 API 스펙: /api/getDepartmentMembers?department=<부서명>
+                const response = await fetch(`/api/getDepartmentMembers?department=${encodeURIComponent(department)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('부서원 응답:', data);
+
+                // 응답 구조: { "부서명": [ {name, job_position, user_id}, ... ] }
+                currentMembers = data[department] || [];
+                renderMembersInRightPanel(currentMembers);
+
+                console.log('부서원 로드 완료:', currentMembers.length);
+            } catch (error) {
+                console.error('부서원 로드 실패:', error);
+                const membersArea = document.getElementById('members-area');
+                membersArea.innerHTML = '<div style="padding: 40px 20px; text-align: center; color: #ef4444; font-size: 13px;">부서원 목록을 불러오는데 실패했습니다.</div>';
+            }
+        }
+
+        // 오른쪽 패널에 부서원 목록 렌더링
+        function renderMembersInRightPanel(members) {
+            const membersArea = document.getElementById('members-area');
+
+            if (members.length === 0) {
+                membersArea.innerHTML = '<div style="padding: 40px 20px; text-align: center; color: #9ca3af; font-size: 13px;">부서원이 없습니다.</div>';
+                return;
+            }
+
+            membersArea.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background-color: #f9fafb; z-index: 1;">
+                        <tr>
+                            <th style="width: 36px; padding: 10px 8px; text-align: center; font-size: 12px; color: #6b7280; font-weight: 600;">
+                                <input type="checkbox" id="select-all-dept-members" style="cursor: pointer;">
+                            </th>
+                            <th style="padding: 10px 8px; text-align: left; font-size: 12px; color: #6b7280; font-weight: 600;">이름</th>
+                            <th style="padding: 10px 8px; text-align: left; font-size: 12px; color: #6b7280; font-weight: 600;">직급</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${members.map(member => `
+                            <tr style="border-bottom: 1px solid #f3f4f6; transition: background-color 0.1s;"
+                                onmouseover="this.style.backgroundColor='#f9fafb'"
+                                onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 8px; text-align: center;">
+                                    <input type="checkbox" class="member-checkbox" value="${member.user_id}"
+                                           data-name="${member.name}"
+                                           data-position="${member.job_position}"
+                                           data-department="${selectedDepartment}">
+                                </td>
+                                <td style="padding: 8px; font-size: 13px; font-weight: 500;">${member.name}</td>
+                                <td style="padding: 8px; font-size: 12px; color: #6b7280;">${member.job_position}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            // 전체 선택 체크박스 이벤트
+            const selectAllCheckbox = document.getElementById('select-all-dept-members');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function(e) {
+                    const checkboxes = document.querySelectorAll('.member-checkbox');
+                    checkboxes.forEach(cb => cb.checked = e.target.checked);
+                });
+            }
+        }
+
+        // 승인자 목록 로드
+        async function loadApprovers() {
+            try {
+                console.log('승인자 목록 조회 시작...');
+
+                const response = await fetch('/leave/user/getApprover', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('승인자 목록 응답:', data);
+
+                approvers = data.approver_list || [];
+                renderApprovers();
+
+                console.log('승인자 목록 로드 완료:', approvers.length);
+            } catch (error) {
+                console.error('승인자 목록 로드 실패:', error);
+                alert('승인자 목록을 불러오는데 실패했습니다.');
+                approvers = [];
+                renderApprovers();
+            }
+        }
+
+        // 승인자 목록 렌더링
+        function renderApprovers() {
+            const tbody = document.getElementById('approvers-tbody');
+
+            if (approvers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: #9ca3af;">등록된 승인자가 없습니다</td></tr>';
+                document.getElementById('approver-count').textContent = '0';
+                return;
+            }
+
+            tbody.innerHTML = approvers.map((item, idx) => `
+                <tr style="transition: background-color 0.1s;"
+                    onmouseover="this.style.backgroundColor='#f9fafb'"
+                    onmouseout="this.style.backgroundColor='transparent'">
+                    <td style="text-align: center; padding: 8px;">
+                        <input type="checkbox" class="approver-checkbox" value="${item.approver_id}">
+                    </td>
+                    <td style="padding: 8px; font-size: 13px; font-weight: 500;">${item.approver_name}</td>
+                    <td style="padding: 8px; font-size: 12px; color: #6b7280;">${item.job_position || '-'}</td>
+                    <td style="padding: 8px; font-size: 13px;">${item.department}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('approver-count').textContent = approvers.length;
+        }
+
+        // 전체 선택 토글 (승인자)
+        function toggleAllApprovers(e) {
+            const checkboxes = document.querySelectorAll('.approver-checkbox');
+            checkboxes.forEach(cb => cb.checked = e.target.checked);
+        }
+
+        // 승인자로 이동
+        async function moveToApprover() {
+            const checkedBoxes = document.querySelectorAll('.member-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                alert('이동할 직원을 선택해주세요.');
+                return;
+            }
+
+            const adminId = localStorage.getItem('userId');
+            let successCount = 0;
+            let failCount = 0;
+
+            for (const checkbox of checkedBoxes) {
+                const userId = checkbox.value;
+                const name = checkbox.getAttribute('data-name');
+                const position = checkbox.getAttribute('data-position');
+                const department = checkbox.getAttribute('data-department');
+
+                try {
+                    const requestBody = {
+                        admin_id: adminId,
+                        approver_id: userId
+                    };
+
+                    console.log('승인자 지정 요청:', requestBody);
+
+                    const response = await fetch('/admin/leave/setApprover', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    successCount++;
+
+                } catch (error) {
+                    console.error(`승인자 지정 실패 (${name}):`, error);
+                    failCount++;
+                }
+            }
+
+            // 승인자 목록 다시 조회
+            await loadApprovers();
+
+            if (successCount > 0) {
+                alert(`${successCount}명의 승인자가 지정되었습니다.${failCount > 0 ? ` (실패: ${failCount}명)` : ''}`);
+            } else {
+                alert('승인자 지정에 실패했습니다.');
+            }
+
+            // 체크박스 해제
+            checkedBoxes.forEach(cb => cb.checked = false);
+        }
+
+        // 승인자에서 제거
+        async function removeFromApprover() {
+            const checkedBoxes = document.querySelectorAll('.approver-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                alert('제거할 승인자를 선택해주세요.');
+                return;
+            }
+
+            if (!confirm(`선택한 ${checkedBoxes.length}명의 승인자 권한을 제거하시겠습니까?`)) {
+                return;
+            }
+
+            const adminId = localStorage.getItem('userId');
+            let successCount = 0;
+            let failCount = 0;
+
+            for (const checkbox of checkedBoxes) {
+                const userId = checkbox.value;
+
+                try {
+                    const requestBody = {
+                        admin_id: adminId,
+                        approver_id: userId
+                    };
+
+                    console.log('승인자 제거 요청:', requestBody);
+
+                    const response = await fetch('/admin/leave/deleteApprover', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    successCount++;
+
+                } catch (error) {
+                    console.error(`승인자 제거 실패 (${userId}):`, error);
+                    failCount++;
+                }
+            }
+
+            // 승인자 목록 다시 조회
+            await loadApprovers();
+
+            if (successCount > 0) {
+                alert(`${successCount}명의 승인자 권한이 제거되었습니다.${failCount > 0 ? ` (실패: ${failCount}명)` : ''}`);
+            } else {
+                alert('승인자 권한 제거에 실패했습니다.');
+            }
+
+            // 체크박스 해제
+            const selectAllApprovers = document.getElementById('select-all-approvers');
+            if (selectAllApprovers) {
+                selectAllApprovers.checked = false;
+            }
+        }
+
+        function closeRemoveModal() {
+            document.getElementById('remove-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

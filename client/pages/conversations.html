@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화 목록 - AAA 관리자 홈</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/conversations.css">
+    <!-- highlight.js 스타일 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <!-- 마크다운 렌더링을 위한 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- highlight.js 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- 추가 언어 지원 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>AAA 관리자 홈</h1>
+            <div class="sidebar-tabs">
+                <a href="../index.html" class="sidebar-tab">홈</a>
+                <a href="dashboard.html" class="sidebar-tab">대시보드</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        사용자 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="users.html" class="sidebar-dropdown-item">재직자</a>
+                        <a href="resigned-users.html" class="sidebar-dropdown-item">퇴사자</a>
+                    </div>
+                </div>
+                <a href="gifts.html" class="sidebar-tab">선물보내기</a>
+                <div class="sidebar-tab-dropdown">
+                    <div class="sidebar-tab sidebar-tab-with-dropdown">
+                        휴가 총괄 관리
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="sidebar-dropdown-content">
+                        <a href="vacation-requests.html" class="sidebar-dropdown-item">부여요청목록</a>
+                        <a href="vacation-history.html" class="sidebar-dropdown-item">부여내역</a>
+                        <a href="vacation-status.html" class="sidebar-dropdown-item">전사원 휴가현황</a>
+                        <a href="vacation-proxy.html" class="sidebar-dropdown-item" style="display: none;">휴가 대리결제</a>
+                        <a href="vacation-manual.html" class="sidebar-dropdown-item">임의휴가부여</a>
+                        <a href="vacation-approvers.html" class="sidebar-dropdown-item">권한관리자 지정</a>
+                        <a href="vacation-promotion.html" class="sidebar-dropdown-item" style="display: none;">연차촉진관리</a>
+                    </div>
+                </div>
+                <!-- <a href="reports.html" class="sidebar-tab">보고서</a> -->
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="logout-btn">로그아웃</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="conversation-controls">
+                <div class="filter-controls">
+                    <div class="search-container">
+                        <input type="text" id="user-search" placeholder="사용자 검색...">
+                        <button type="button" id="search-button" class="search-button">
+                            검색
+                        </button>
+                    </div>
+                    <div class="filter-container">
+                        <select id="department-filter">
+                            <option value="all">전체 부서</option>
+                            <option value="경영관리실">경영관리실</option>
+                            <option value="New Tech사업부">New Tech사업부</option>
+                            <option value="솔루션사업부">솔루션사업부</option>
+                            <option value="FCM사업부">FCM사업부</option>
+                            <option value="SCM사업부">SCM사업부</option>
+                            <option value="Innovation Center">Innovation Center</option>
+                            <option value="Biz AI사업부">Biz AI사업부</option>
+                            <option value="HRS사업부">HRS사업부</option>
+                            <option value="DTE본부">DTE본부</option>
+                            <option value="남부지사">남부지사</option>
+                            <option value="중국지사">중국지사</option>
+                            <option value="PUBLIC CLOUD사업부">PUBLIC CLOUD사업부</option>
+                            <option value="ITS사업부">ITS사업부</option>
+                            <option value="BAC사업부">BAC사업부</option>
+                            <option value="NGE본부">NGE본부</option>
+                            <option value="대표이사">대표이사</option>
+                        </select>
+                        <select id="category-filter">
+                            <option value="all">전체 카테고리</option>
+                            <option value="code">코드</option>
+                            <option value="sap">SAP</option>
+                            <option value="common">일반</option>
+                            <option value="policy">사내규정</option>
+                            <option value="hr">인사</option>
+                            <option value="csr">CSR</option>
+                            <option value="postMail">메일</option>
+                        </select>
+                        <button type="button" id="apply-filter" class="filter-button">필터적용</button>
+                        <button type="button" id="clear-filter" class="filter-button">필터제거</button>
+                    </div>
+                    <!-- 활성 필터 태그 표시 영역 추가 -->
+                    <div id="active-filters" class="active-filters"></div>
+                </div>
+                <button id="past-conversations" class="action-button">삭제된 대화</button>
+            </div>
+            
+            <div class="table-container">
+                <table id="conversations-table">
+                    <thead>
+                        <tr>
+                            <th>Chat No.</th>
+                            <th>사용자</th>
+                            <th>부서</th>
+                            <th>카테고리</th>
+                            <th>채팅방제목</th>
+                            <th>내용</th>
+                            <th>최종 대화 시간</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 대화 데이터가 여기에 동적으로 추가됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 페이지네이션 컨트롤 추가 -->
+            <div class="pagination" id="pagination">
+                <!-- 페이지네이션 버튼들이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세 정보 모달 -->
+    <div id="detail-modal" class="detail-modal">
+        <div class="detail-modal-content">
+            <div class="detail-modal-header">
+                <h2 class="detail-modal-title">대화 상세 정보</h2>
+                <span class="detail-modal-close">&times;</span>
+            </div>
+            <div class="detail-modal-body">
+                <div class="detail-info-group">
+                    <div class="detail-info-label">Chat No.</div>
+                    <div class="detail-info-value" id="detail-id"></div>
+                </div>
+                <div class="detail-info-group">
+                    <div class="detail-info-label">사용자</div>
+                    <div class="detail-info-value" id="detail-user"></div>
+                </div>
+                <div class="detail-info-group">
+                    <div class="detail-info-label">부서</div>
+                    <div class="detail-info-value" id="detail-department"></div>
+                </div>
+                <div class="detail-info-group">
+                    <div class="detail-info-label">카테고리</div>
+                    <div class="detail-info-value" id="detail-category"></div>
+                </div>
+                <div class="detail-info-group">
+                    <div class="detail-info-label">채팅방제목</div>
+                    <div class="detail-info-value" id="detail-title"></div>
+                </div>
+                <div class="detail-info-group">
+                    <div class="detail-info-label">최종 대화 시간</div>
+                    <div class="detail-info-value" id="detail-time"></div>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-content-label">내용</div>
+                    <div class="conversation-messages">
+                        <!-- 대화 메시지가 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/utils/auth.js"></script>
+    <script src="../js/conversations.js"></script>
+    <script>
+        // 페이지 로드 시 권한별 메뉴 제어
+        document.addEventListener('DOMContentLoaded', function() {
+            controlSidebarMenus();
+        });
+    </script>
+</body>
+</html>

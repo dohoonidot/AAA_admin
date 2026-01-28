@@ -1,0 +1,544 @@
+/* 매출/매입계약 기안서 에디터 스타일 */
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* 툴바 스타일 */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    flex-wrap: wrap;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-right: 10px;
+    border-right: 1px solid #dee2e6;
+}
+
+.toolbar-group:last-child {
+    border-right: none;
+    margin-left: auto;
+}
+
+.toolbar-select {
+    padding: 5px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.toolbar-select:hover {
+    border-color: #adb5bd;
+}
+
+.toolbar-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.toolbar-btn {
+    padding: 6px 12px;
+    border: 1px solid #c3ccd6;
+    border-radius: 6px;
+    background: #f5f7fb;
+    color: #1a1f36;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    min-width: 36px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+.toolbar-btn:hover {
+    background: #e2e8f4;
+    border-color: #94a3b8;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(15, 23, 42, 0.12);
+}
+
+.toolbar-btn:active {
+    background: #cbd5f0;
+    border-color: #64748b;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.toolbar-btn.active {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.toolbar-btn strong {
+    font-weight: bold;
+}
+
+.toolbar-btn em {
+    font-style: italic;
+}
+
+.toolbar-btn u {
+    text-decoration: underline;
+}
+
+.toolbar-btn .strike-text {
+    text-decoration: line-through;
+    font-weight: bold;
+}
+
+.color-picker {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    border: 1px solid #c3ccd6;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #f7f9fc 0%, #edf1f9 100%);
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.color-picker:hover {
+    border-color: #94a3b8;
+    background: linear-gradient(180deg, #eef3fb 0%, #dfe7f5 100%);
+}
+
+.color-picker input[type="color"] {
+    border: none;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    background: none;
+    cursor: pointer;
+}
+
+.color-picker input[type="color"]::-webkit-color-swatch {
+    border: 1px solid #7f8ea3;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.color-picker input[type="color"]::-moz-color-swatch {
+    border: 1px solid #7f8ea3;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.picker-label {
+    font-weight: bold;
+    font-size: 14px;
+    color: #1a1f36;
+}
+
+.picker-label.highlight {
+    background: linear-gradient(180deg, transparent 60%, #fffacd 60%);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+/* 에디터 영역 */
+.editor-wrapper {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    background: #fff;
+}
+
+/* 전역 텍스트 선택 스타일 */
+.editor-content ::selection {
+    background-color: rgba(74, 108, 247, 0.3);
+    color: inherit;
+}
+
+.editor-content ::-moz-selection {
+    background-color: rgba(74, 108, 247, 0.3);
+    color: inherit;
+}
+
+.editor-content {
+    min-height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    background: #fff;
+    font-family: '맑은고딕', 'Malgun Gothic', sans-serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    outline: none;
+}
+
+/* contenteditable 요소 스타일 */
+.editor-content [contenteditable="true"] {
+    outline: none;
+    transition: background-color 0.2s ease;
+}
+
+.editor-content [contenteditable="true"]:hover {
+    background-color: rgba(74, 108, 247, 0.02);
+}
+
+.editor-content [contenteditable="true"]:focus {
+    background-color: rgba(74, 108, 247, 0.05);
+    outline: 1px dashed rgba(74, 108, 247, 0.3);
+    outline-offset: 2px;
+}
+
+/* 제목 및 헤더 스타일 개선 */
+.editor-content h1[contenteditable="true"],
+.editor-content h2[contenteditable="true"] {
+    cursor: text;
+}
+
+.editor-content h1[contenteditable="true"]:empty::before {
+    content: '제목을 입력하세요';
+    color: #aaa;
+}
+
+.editor-content h2[contenteditable="true"]:empty::before {
+    content: '소제목을 입력하세요';
+    color: #aaa;
+}
+
+/* 리스트 아이템 스타일 */
+.editor-content li[contenteditable="true"] {
+    cursor: text;
+}
+
+.editor-content li[contenteditable="true"]:empty::before {
+    content: '항목을 입력하세요';
+    color: #aaa;
+}
+
+/* 표 스타일 */
+.contract-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12pt;
+}
+
+.contract-table th {
+    background: #f8f9fa;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.contract-table td {
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    min-height: 30px;
+    vertical-align: top;
+}
+
+.contract-table td[contenteditable="true"]:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+    background: #f0f8ff;
+}
+
+.contract-table td[contenteditable="true"]:hover {
+    background-color: rgba(74, 108, 247, 0.03);
+    cursor: text;
+}
+
+.contract-table td[contenteditable="true"]:empty::before {
+    content: ' ';
+    display: inline-block;
+}
+
+/* 테이블 셀 내 텍스트 선택 스타일 */
+.contract-table td[contenteditable="true"]::selection {
+    background-color: rgba(74, 108, 247, 0.3);
+    color: inherit;
+}
+
+.contract-table td[contenteditable="true"]::-moz-selection {
+    background-color: rgba(74, 108, 247, 0.3);
+    color: inherit;
+}
+
+/* 테이블 헤더 셀 스타일 */
+.contract-table th {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* 셀 에디터 전용 스타일 */
+.active-cell {
+    outline: 2px solid #4A6CF7 !important;
+    outline-offset: -2px;
+    background-color: rgba(74, 108, 247, 0.08) !important;
+    box-shadow: inset 0 0 0 1px rgba(74, 108, 247, 0.3);
+}
+
+.cell-selected {
+    background-color: rgba(74, 108, 247, 0.15) !important;
+    border-color: #4A6CF7 !important;
+    position: relative;
+}
+
+.cell-selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(74, 108, 247, 0.6);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 다중 셀 선택 시 첫 번째 셀 표시 */
+.cell-selected:first-of-type {
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3);
+}
+
+/* 셀 편집 중 커서 스타일 */
+td[contenteditable="true"] {
+    cursor: text;
+    transition: all 0.15s ease;
+}
+
+/* 요약 행 스타일 */
+.summary-row {
+    background: #fffacd !important; /* 노란색 배경 */
+    font-weight: bold;
+}
+
+.summary-row td {
+    background: #fffacd !important;
+}
+
+.cost-row {
+    background: #e6f3ff !important; /* 파란색 배경 */
+}
+
+.cost-row td {
+    background: #e6f3ff !important;
+}
+
+.sales-row {
+    background: #fffacd !important; /* 노란색 배경 */
+}
+
+.purchase-row {
+    background: #fffacd !important; /* 노란색 배경 */
+}
+
+/* 인쇄 스타일 */
+@media print {
+    .toolbar {
+        display: none;
+    }
+    
+    .editor-wrapper {
+        padding: 0;
+    }
+    
+    .editor-content {
+        padding: 20px;
+    }
+    
+    .contract-table {
+        page-break-inside: avoid;
+    }
+}
+
+/* 테이블 컨텍스트 메뉴 */
+.table-context-menu {
+    display: none;
+    position: fixed;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    min-width: 180px;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    color: #1a1f36;
+    transition: background-color 0.2s;
+}
+
+.context-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.context-menu-divider {
+    height: 1px;
+    background-color: #dee2e6;
+    margin: 4px 0;
+}
+
+.contract-table td,
+.contract-table th {
+    position: relative;
+    user-select: none;
+}
+
+.contract-table td:hover,
+.contract-table th:hover {
+    background-color: rgba(74, 108, 247, 0.05);
+}
+
+/* 표 선택 및 드래그/리사이즈 스타일 */
+.table-selected {
+    outline: 2px solid #4A6CF7 !important;
+    outline-offset: 2px;
+    position: relative;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+}
+
+.table-selected:hover {
+    cursor: move;
+}
+
+.table-border-hover {
+    outline: 2px dashed #4A6CF7 !important;
+    outline-offset: 2px;
+}
+
+.table-context-highlight {
+    box-shadow: inset 0 0 0 2px #4A6CF7;
+    border-color: #4A6CF7 !important;
+}
+
+.table-cell-selected {
+    background-color: rgba(74, 108, 247, 0.12) !important;
+    border-color: #4A6CF7 !important;
+    position: relative;
+}
+
+.table-cell-selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(74, 108, 247, 0.6);
+    pointer-events: none;
+}
+
+.table-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+.table-handle {
+    position: absolute;
+    background: #4A6CF7;
+    color: white;
+    cursor: pointer;
+    z-index: 1000;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.table-handle:hover {
+    background: #3A5CE7;
+    transform: scale(1.1);
+}
+
+.table-drag-handle {
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 20px;
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.table-resize-handle {
+    bottom: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4A6CF7;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    cursor: nwse-resize;
+}
+
+.table-resize-handle::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 8px 8px;
+    border-color: transparent transparent white transparent;
+}
+
+/* 표가 절대 위치일 때 스타일 */
+.contract-table[style*="position: absolute"] {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 웹뷰 최적화 */
+@media (max-width: 768px) {
+    .toolbar {
+        padding: 8px;
+    }
+    
+    .toolbar-group {
+        flex-wrap: wrap;
+    }
+    
+    .editor-content {
+        padding: 15px;
+    }
+    
+    .contract-table {
+        font-size: 10pt;
+    }
+    
+    .contract-table th,
+    .contract-table td {
+        padding: 5px;
+    }
+    
+    .table-context-menu {
+        min-width: 160px;
+        font-size: 12px;
+    }
+    
+    .context-menu-item {
+        padding: 6px 12px;
+    }
+}
+
