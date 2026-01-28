@@ -6,6 +6,7 @@
     <title>휴가신청승인 관리 - AAA 관리자 홈</title>
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/vacation-admin.css">
+    <link rel="stylesheet" href="../css/sort-styles.css">
 </head>
 <body>
     <div class="container">
@@ -63,6 +64,10 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label>이름 검색</label>
+                        <input id="name-filter" type="text" class="filter-input" placeholder="이름 입력">
+                    </div>
+                    <div class="filter-group">
                         <label>필터 유형</label>
                         <select id="view-type-filter" class="filter-select">
                             <option value="">전체</option>
@@ -88,6 +93,7 @@
                     </div>
                     <button id="search-btn" class="refresh-btn">조회</button>
                 </div>
+                <div id="active-filters" class="active-filters"></div>
             </div>
 
             <div class="history-table-container">
@@ -95,13 +101,13 @@
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>이름</th>
-                            <th>부서</th>
+                            <th class="sortable-header" data-sort-key="name">이름 <span class="sort-icon">↕</span></th>
+                            <th class="sortable-header" data-sort-key="department">부서 <span class="sort-icon">↕</span></th>
                             <th>휴가명</th>
-                            <th>휴가일자</th>
+                            <th class="sortable-header" data-sort-key="leave_date">휴가일자 <span class="sort-icon">↕</span></th>
                             <th>사용일수</th>
-                            <th>신청일</th>
-                            <th>승인상태</th>
+                            <th class="sortable-header" data-sort-key="requested_date">신청일 <span class="sort-icon">↕</span></th>
+                            <th class="sortable-header" data-sort-key="status">승인상태 <span class="sort-icon">↕</span></th>
                         </tr>
                     </thead>
                     <tbody id="leave-history-tbody">
@@ -224,6 +230,7 @@
         let currentPage = 1;
         const pageSize = 20;
         let totalPages = 1;
+        let sortState = { key: null, direction: 'asc' };
 
         document.addEventListener('DOMContentLoaded', function() {
             controlSidebarMenus();
@@ -255,10 +262,27 @@
                 loadLeaveHistory();
             });
 
+            // 이름 검색 엔터
+            document.getElementById('name-filter').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    currentPage = 1;
+                    loadLeaveHistory();
+                }
+            });
+
             // 연도 변경
             document.getElementById('year-filter').addEventListener('change', function() {
                 currentPage = 1;
                 loadLeaveHistory();
+            });
+
+            // 정렬 헤더 클릭
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const key = this.dataset.sortKey;
+                    updateSortState(key);
+                    displayLeaveHistory(currentLeaveData || []);
+                });
             });
         });
 
@@ -266,6 +290,11 @@
         function initializeYearFilter() {
             const yearSelect = document.getElementById('year-filter');
             const currentYear = new Date().getFullYear();
+
+            const allOption = document.createElement('option');
+            allOption.value = '';
+            allOption.textContent = '전체';
+            yearSelect.appendChild(allOption);
 
             // 현재 연도부터 5년 전까지 + 1년 후까지 (2026년 포함)
             for (let year = currentYear + 1; year >= currentYear - 5; year--) {
@@ -300,17 +329,26 @@
         // 휴가 신청 이력 조회
         async function loadLeaveHistory() {
             try {
-                const year = parseInt(document.getElementById('year-filter').value);
+                updateActiveFilters();
+                const yearValue = document.getElementById('year-filter').value;
                 const viewType = document.getElementById('view-type-filter').value;
                 const department = document.getElementById('department-filter').value;
                 const leaveType = document.getElementById('leave-type-filter').value;
+                const name = document.getElementById('name-filter').value.trim();
 
                 const requestBody = {
-                    year: year,
                     view_type: viewType,
                     department: viewType === 'department' ? department : '',
                     leave_type: viewType === 'leave_type' ? leaveType : ''
                 };
+
+                if (yearValue) {
+                    requestBody.year = parseInt(yearValue, 10);
+                }
+
+                if (name) {
+                    requestBody.name = name;
+                }
 
                 console.log('휴가 신청 이력 조회 요청:', requestBody);
 
@@ -358,7 +396,9 @@
                 return;
             }
 
-            tbody.innerHTML = leaves.map((leave, idx) => {
+            const sortedLeaves = getSortedLeaves(leaves);
+
+            tbody.innerHTML = sortedLeaves.map((leave, idx) => {
                 const startIdx = (currentPage - 1) * pageSize;
                 const nameWithPosition = `${leave.name} ${leave.job_position}`;
                 const leaveDate = formatDateRange(leave.start_date, leave.end_date);
@@ -381,6 +421,132 @@
                     </tr>
                 `;
             }).join('');
+
+            updateSortIcons();
+        }
+
+        function updateSortState(key) {
+            if (sortState.key === key) {
+                sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState.key = key;
+                sortState.direction = 'asc';
+            }
+        }
+
+        function updateSortIcons() {
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                const icon = header.querySelector('.sort-icon');
+                const key = header.dataset.sortKey;
+                header.classList.remove('sort-active');
+                if (!icon) return;
+
+                if (sortState.key === key) {
+                    header.classList.add('sort-active');
+                    icon.textContent = sortState.direction === 'asc' ? '▲' : '▼';
+                } else {
+                    icon.textContent = '↕';
+                }
+            });
+        }
+
+        function getSortedLeaves(leaves) {
+            if (!sortState.key) return leaves;
+
+            const sorted = [...leaves];
+            const direction = sortState.direction === 'asc' ? 1 : -1;
+
+            sorted.sort((a, b) => {
+                switch (sortState.key) {
+                    case 'name':
+                        return direction * String(a.name || '').localeCompare(String(b.name || ''), 'ko');
+                    case 'department':
+                        return direction * String(a.department || '').localeCompare(String(b.department || ''), 'ko');
+                    case 'leave_date': {
+                        const aStart = new Date(a.start_date).getTime() || 0;
+                        const bStart = new Date(b.start_date).getTime() || 0;
+                        if (aStart !== bStart) return direction * (aStart - bStart);
+                        const aEnd = new Date(a.end_date).getTime() || 0;
+                        const bEnd = new Date(b.end_date).getTime() || 0;
+                        return direction * (aEnd - bEnd);
+                    }
+                    case 'requested_date': {
+                        const aReq = new Date(a.requested_date).getTime() || 0;
+                        const bReq = new Date(b.requested_date).getTime() || 0;
+                        return direction * (aReq - bReq);
+                    }
+                    case 'status': {
+                        const aStatus = getStatusSortText(a.status);
+                        const bStatus = getStatusSortText(b.status);
+                        return direction * aStatus.localeCompare(bStatus, 'ko');
+                    }
+                    default:
+                        return 0;
+                }
+            });
+
+            return sorted;
+        }
+
+        function getStatusSortText(status) {
+            const statusMap = {
+                'APPROVED': '승인',
+                'REJECTED': '반려',
+                'CANCELLED': '취소',
+                'PENDING': '대기',
+                'REQUESTED': '대기',
+                'CANCEL_REQUESTED': '취소대기',
+                'CANCEL_PENDING': '승인취소요청',
+                'CANCEL_APPROVED': '승인취소',
+                '승인': '승인',
+                '반려': '반려',
+                '취소': '취소',
+                '대기': '대기',
+                '취소대기': '취소대기',
+                '승인취소요청': '승인취소요청',
+                '승인취소': '승인취소'
+            };
+            return statusMap[status] || String(status || '');
+        }
+
+        function updateActiveFilters() {
+            const container = document.getElementById('active-filters');
+            if (!container) return;
+
+            const yearValue = document.getElementById('year-filter').value;
+            const viewType = document.getElementById('view-type-filter').value;
+            const department = document.getElementById('department-filter').value;
+            const leaveType = document.getElementById('leave-type-filter').value;
+            const name = document.getElementById('name-filter').value.trim();
+
+            const tags = [];
+
+            tags.push(`연도: ${yearValue ? `${yearValue}년` : '전체'}`);
+
+            if (name) {
+                tags.push(`이름: ${name}`);
+            }
+
+            if (viewType === 'department') {
+                tags.push(`필터: 부서별`);
+                if (department) {
+                    tags.push(`부서: ${department}`);
+                }
+            } else if (viewType === 'leave_type') {
+                tags.push(`필터: 휴가타입별`);
+                if (leaveType) {
+                    tags.push(`휴가타입: ${leaveType}`);
+                }
+            } else {
+                tags.push('필터: 전체');
+            }
+
+            if (tags.length === 0) {
+                container.innerHTML = '<span class="filter-tag">필터 없음</span>';
+                return;
+            }
+
+            container.innerHTML = tags.map(text => `<span class="filter-tag">${text}</span>`).join('');
         }
 
         // 날짜 범위 포맷

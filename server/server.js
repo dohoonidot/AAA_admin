@@ -1206,16 +1206,25 @@ app.post('/admin/leave/management/history', (req, res) => {
         console.log('요청 본문:', req.body);
         console.log('쿼리 파라미터:', req.query);
 
-        const { year, view_type, department, leave_type } = req.body || {};
+        const { year, view_type, department, leave_type, name } = req.body || {};
         const page = req.query.page || 1;
         const page_size = req.query.page_size || 20;
 
-        const payload = JSON.stringify({
-          year: year || new Date().getFullYear(),
+        const payloadBody = {
           view_type: view_type || '',
           department: department || '',
           leave_type: leave_type || ''
-        });
+        };
+
+        if (year !== undefined && year !== null && year !== '') {
+          payloadBody.year = year;
+        }
+
+        if (name) {
+          payloadBody.name = name;
+        }
+
+        const payload = JSON.stringify(payloadBody);
         console.log('외부 API 호출 페이로드:', payload);
 
         const options = {

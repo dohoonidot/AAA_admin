@@ -136,6 +136,24 @@
     box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
 }
 
+.filter-input {
+    padding: 10px 16px;
+    border: 1.5px solid #dee2e6;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+    min-width: 180px;
+    transition: all 0.2s ease;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: #0066ff;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
 .refresh-btn {
     padding: 10px 16px;
     background: #f8f9fa;
@@ -155,6 +173,33 @@
 .refresh-btn:hover {
     background: #e9ecef;
     border-color: #adb5bd;
+}
+
+/* 활성 필터 표시 */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    min-height: 40px;
+    align-items: center;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* 요청 카드 컨테이너 */
