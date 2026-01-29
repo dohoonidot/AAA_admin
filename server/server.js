@@ -18,7 +18,7 @@ if (!fs.existsSync(imageDir)) {
 }
 
 const app = express();
-const PORT = 9998; // 포트를 9999로 고정
+const PORT = process.env.PORT || 9999; // 환경변수 없으면 9999 (서버 기본값)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // Middleware
