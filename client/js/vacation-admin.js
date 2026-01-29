@@ -761,8 +761,9 @@ function createRequestCard(request, index) {
             </div>
 
             ${request.reason ? `
-            <div class="reason-preview">
-                <span class="reason-text">${request.reason.length > 30 ? request.reason.substring(0, 30) + '...' : request.reason}</span>
+            <div class="reason-section-card">
+                <span class="reason-label">사유</span>
+                <div class="reason-full-text">${request.reason}</div>
             </div>` : ''}
 
             ${attachmentsHtml}
