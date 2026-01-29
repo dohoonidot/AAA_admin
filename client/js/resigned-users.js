@@ -240,7 +240,7 @@ async function restoreUserToActive(user) {
         restoreBtn.textContent = '처리 중...';
 
         // 프록시 사용 (서버 로그를 확인하기 위해)
-        // const USER_API_URL = 'https://ai2great.com:8060/admin';
+        // const USER_API_URL = '/admin';
 
         // 현재 사용자 정보를 기반으로 재직 상태만 변경
         // 모든 숫자 필드를 명시적으로 변환 (users.js 패턴과 동일)

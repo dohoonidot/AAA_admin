@@ -239,7 +239,7 @@
             try {
                 console.log('부서 목록 조회 시작...');
                 
-                const response = await fetch('https://ai2great.com:8060/api/getDepartmentList');
+                const response = await fetch('/api/getDepartmentList');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -301,7 +301,7 @@
                 
                 userSelect.innerHTML = '<option value="">불러오는 중...</option>';
 
-                const response = await fetch(`https://ai2great.com:8060/api/getDepartmentMembers?department=${encodeURIComponent(department)}`);
+                const response = await fetch(`/api/getDepartmentMembers?department=${encodeURIComponent(department)}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -431,7 +431,7 @@
 
                 console.log('휴가 부여 요청:', requestBody);
 
-                const response = await fetch('https://ai2great.com:8060/admin/leave/customGrant', {
+                const response = await fetch('/admin/leave/customGrant', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

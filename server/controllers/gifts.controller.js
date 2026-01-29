@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const GIFT_UPSTREAM_HOST = process.env.GIFT_UPSTREAM_HOST || 'localhost';
+const GIFT_UPSTREAM_PORT = Number(process.env.GIFT_UPSTREAM_PORT || 9999);
 
 // 상품 목록 조회
 const getProducts = async (req, res) => {
@@ -289,10 +291,13 @@ const sendGiftExternal = async (req, res) => {
 
         console.log('🎁 외부 선물 보내기 API 호출:', requestBody);
 
+        const httpUrl = `http://${GIFT_UPSTREAM_HOST}:${GIFT_UPSTREAM_PORT}/send_gift`;
+        const httpsUrl = `https://${GIFT_UPSTREAM_HOST}:${GIFT_UPSTREAM_PORT}/send_gift`;
+
         // 외부 API 호출 시도 (HTTP)
         let response;
         try {
-            response = await fetch('http://211.43.205.49:9999/send_gift', {
+            response = await fetch(httpUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -304,7 +309,7 @@ const sendGiftExternal = async (req, res) => {
             
             // HTTPS로 재시도
             try {
-                response = await fetch('https://211.43.205.49:9999/send_gift', {
+                response = await fetch(httpsUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

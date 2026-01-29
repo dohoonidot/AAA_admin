@@ -518,7 +518,7 @@ async function sendGift() {
 
     try {
         console.log('🎁 외부 선물 보내기 API 호출:', requestBody);
-        const response = await fetch('http://ai2great.com:9999/send_gift', {
+        const response = await fetch('/api/gifts/send-external', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

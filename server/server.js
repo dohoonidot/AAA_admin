@@ -20,6 +20,8 @@ if (!fs.existsSync(imageDir)) {
 const app = express();
 const PORT = process.env.PORT || 9999; // 환경변수 없으면 9999 (서버 기본값)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const UPSTREAM_HOST = process.env.UPSTREAM_HOST || 'localhost';
+const UPSTREAM_PORT = Number(process.env.UPSTREAM_PORT || 8060);
 
 // Middleware
 app.use(cors());
@@ -75,8 +77,8 @@ app.post('/admin/login', (req, res) => {
     console.log('외부 API 호출 페이로드:', { user_id, password: '****' });
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/admin/login',
       method: 'POST',
       headers: {
@@ -192,8 +194,8 @@ app.post('/admin/leave/approval', async (req, res) => {
       console.log('📤 [외부 API 전송] 페이로드 길이:', Buffer.byteLength(payload), 'bytes');
 
       const options = {
-        hostname: 'ai2great.com',
-        port: 8060,
+        hostname: UPSTREAM_HOST,
+        port: UPSTREAM_PORT,
         path: '/admin/leave/approval',
         method: 'POST',
         headers: {
@@ -343,8 +345,8 @@ app.post('/api/admin/deleteUser', (req, res) => {
       console.log('외부 API 호출 페이로드:', payload);
 
       const options = {
-        hostname: 'ai2great.com',
-        port: 8060,
+        hostname: UPSTREAM_HOST,
+        port: UPSTREAM_PORT,
         path: '/admin/deleteUser',
         method: 'POST',
         headers: {
@@ -437,8 +439,8 @@ app.post('/admin/updateUser', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/admin/updateUser',
       method: 'POST',
       headers: {
@@ -524,8 +526,8 @@ app.post('/api/leave/grant/request', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/leave/grant/request',
       method: 'POST',
       headers: {
@@ -599,8 +601,8 @@ app.post('/api/leave/grant/getRequestList', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/leave/grant/getRequestList',
       method: 'POST',
       headers: {
@@ -672,8 +674,8 @@ app.post('/api/leave/grant/management', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: `/leave/grant/management?page=${page}&page_size=${pageSize}`,
       method: 'POST',
       headers: {
@@ -738,8 +740,8 @@ app.post('/api/leave/grant/management/memo', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/leave/grant/management/memo',
       method: 'POST',
       headers: {
@@ -816,8 +818,8 @@ app.post('/api/leave/grant/approval', async (req, res) => {
       console.log('외부 API 호출 페이로드:', payload);
 
       const options = {
-        hostname: 'ai2great.com',
-        port: 8060,
+        hostname: UPSTREAM_HOST,
+        port: UPSTREAM_PORT,
         path: '/leave/grant/approval',
         method: 'POST',
         headers: {
@@ -911,8 +913,8 @@ app.get('/api/getDepartmentList', (req, res) => {
     console.log('=== 부서 목록 조회 API 요청 ===');
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/api/getDepartmentList',
       method: 'GET',
       headers: {
@@ -987,8 +989,8 @@ app.get('/api/getDepartmentMembers', (req, res) => {
     }
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: `/api/getDepartmentMembers?department=${encodeURIComponent(department)}`,
       method: 'GET',
       headers: {
@@ -1048,6 +1050,77 @@ app.get('/api/getDepartmentMembers', (req, res) => {
   }
 });
 
+// Proxy: getUpdatePrivacyCount (개인정보 동의 추이 조회)
+app.post('/api/getUpdatePrivacyCount', (req, res) => {
+  try {
+    console.log('=== 개인정보 동의 추이 조회 API 요청 ===');
+    console.log('요청 본문:', req.body);
+
+    const payload = JSON.stringify(req.body || {});
+    const options = {
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
+      path: '/api/getUpdatePrivacyCount',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      },
+      timeout: 10000
+    };
+
+    console.log('외부 API 옵션:', options);
+
+    const proxyReq = https.request(options, (proxyRes) => {
+      console.log('외부 API 응답 상태:', proxyRes.statusCode);
+      let data = '';
+
+      proxyRes.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      proxyRes.on('end', () => {
+        console.log('외부 API 응답 완료:', data);
+        const status = proxyRes.statusCode || 500;
+        try {
+          const json = data ? JSON.parse(data) : {};
+          console.log('파싱된 응답:', json);
+          return res.status(status).json(json);
+        } catch (e) {
+          console.error('JSON 파싱 오류:', e);
+          return res.status(status).send(data);
+        }
+      });
+    });
+
+    proxyReq.on('error', (err) => {
+      console.error('개인정보 동의 추이 조회 proxy error:', err.message);
+      return res.status(502).json({
+        status_code: 502,
+        error: `Upstream request failed: ${err.message}`
+      });
+    });
+
+    proxyReq.on('timeout', () => {
+      console.error('외부 API 타임아웃');
+      proxyReq.destroy();
+      return res.status(504).json({
+        status_code: 504,
+        error: 'Request timeout'
+      });
+    });
+
+    proxyReq.write(payload);
+    proxyReq.end();
+  } catch (error) {
+    console.error('개인정보 동의 추이 조회 proxy handler error:', error);
+    return res.status(500).json({
+      status_code: 500,
+      error: `Internal server error: ${error.message}`
+    });
+  }
+});
+
 // Proxy: setApprover (승인자 지정)
 app.post('/admin/leave/setApprover', (req, res) => {
   try {
@@ -1068,8 +1141,8 @@ app.post('/admin/leave/setApprover', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/admin/leave/setApprover',
       method: 'POST',
       headers: {
@@ -1137,8 +1210,8 @@ app.post('/leave/user/getApprover', (req, res) => {
     console.log('=== 승인자 목록 조회 API 요청 ===');
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/leave/user/getApprover',
       method: 'POST',
       headers: {
@@ -1228,8 +1301,8 @@ app.post('/admin/leave/management/history', (req, res) => {
         console.log('외부 API 호출 페이로드:', payload);
 
         const options = {
-          hostname: 'ai2great.com',
-          port: 8060,
+          hostname: UPSTREAM_HOST,
+          port: UPSTREAM_PORT,
           path: `/admin/leave/management/history?page=${page}&page_size=${page_size}`,
           method: 'POST',
           headers: {
@@ -1303,6 +1376,153 @@ app.post('/admin/leave/management/history', (req, res) => {
   }
 });
 
+// Proxy: leave management (전사원 휴가현황)
+app.post('/admin/leave/management', (req, res) => {
+  try {
+    console.log('=== 전사원 휴가현황 API 요청 ===');
+    console.log('요청 본문:', req.body);
+    console.log('쿼리 파라미터:', req.query);
+
+    const page = req.query.page || 1;
+    const page_size = req.query.page_size || 20;
+    const payload = JSON.stringify(req.body || {});
+
+    const options = {
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
+      path: `/admin/leave/management?page=${page}&page_size=${page_size}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      },
+      timeout: 10000
+    };
+
+    console.log('외부 API 옵션:', options);
+
+    const proxyReq = https.request(options, (proxyRes) => {
+      console.log('외부 API 응답 상태:', proxyRes.statusCode);
+      let data = '';
+
+      proxyRes.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      proxyRes.on('end', () => {
+        console.log('외부 API 응답 완료:', data);
+        const status = proxyRes.statusCode || 500;
+        try {
+          const json = data ? JSON.parse(data) : {};
+          console.log('파싱된 응답:', json);
+          return res.status(status).json(json);
+        } catch (e) {
+          console.error('JSON 파싱 오류:', e);
+          return res.status(status).send(data);
+        }
+      });
+    });
+
+    proxyReq.on('error', (err) => {
+      console.error('전사원 휴가현황 proxy error:', err.message);
+      return res.status(502).json({
+        status_code: 502,
+        error: `Upstream request failed: ${err.message}`
+      });
+    });
+
+    proxyReq.on('timeout', () => {
+      console.error('외부 API 타임아웃');
+      proxyReq.destroy();
+      return res.status(504).json({
+        status_code: 504,
+        error: 'Request timeout'
+      });
+    });
+
+    proxyReq.write(payload);
+    proxyReq.end();
+  } catch (error) {
+    console.error('전사원 휴가현황 proxy handler error:', error);
+    return res.status(500).json({
+      status_code: 500,
+      error: `Internal server error: ${error.message}`
+    });
+  }
+});
+
+// Proxy: leave custom grant (임의휴가부여)
+app.post('/admin/leave/customGrant', (req, res) => {
+  try {
+    console.log('=== 임의휴가부여 API 요청 ===');
+    console.log('요청 본문:', req.body);
+
+    const payload = JSON.stringify(req.body || {});
+
+    const options = {
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
+      path: '/admin/leave/customGrant',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      },
+      timeout: 10000
+    };
+
+    console.log('외부 API 옵션:', options);
+
+    const proxyReq = https.request(options, (proxyRes) => {
+      console.log('외부 API 응답 상태:', proxyRes.statusCode);
+      let data = '';
+
+      proxyRes.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      proxyRes.on('end', () => {
+        console.log('외부 API 응답 완료:', data);
+        const status = proxyRes.statusCode || 500;
+        try {
+          const json = data ? JSON.parse(data) : {};
+          console.log('파싱된 응답:', json);
+          return res.status(status).json(json);
+        } catch (e) {
+          console.error('JSON 파싱 오류:', e);
+          return res.status(status).send(data);
+        }
+      });
+    });
+
+    proxyReq.on('error', (err) => {
+      console.error('임의휴가부여 proxy error:', err.message);
+      return res.status(502).json({
+        status_code: 502,
+        error: `Upstream request failed: ${err.message}`
+      });
+    });
+
+    proxyReq.on('timeout', () => {
+      console.error('외부 API 타임아웃');
+      proxyReq.destroy();
+      return res.status(504).json({
+        status_code: 504,
+        error: 'Request timeout'
+      });
+    });
+
+    proxyReq.write(payload);
+    proxyReq.end();
+  } catch (error) {
+    console.error('임의휴가부여 proxy handler error:', error);
+    return res.status(500).json({
+      status_code: 500,
+      error: `Internal server error: ${error.message}`
+    });
+  }
+});
+
 // Proxy: leave management approval history (휴가 승인 이력 조회)
 app.get('/admin/leave/management/approvalHistory', (req, res) => {
   try {
@@ -1320,8 +1540,8 @@ app.get('/admin/leave/management/approvalHistory', (req, res) => {
     }
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: `/admin/leave/management/approvalHistory?id=${id}`,
       method: 'GET',
       headers: {
@@ -1402,8 +1622,8 @@ app.post('/admin/leave/management/former', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/admin/leave/management/former',
       method: 'POST',
       headers: {
@@ -1485,8 +1705,8 @@ app.post('/admin/leave/management/detail', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/admin/leave/management/detail',
       method: 'POST',
       headers: {
@@ -1568,8 +1788,8 @@ app.post('/admin/leave/deleteApprover', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/admin/leave/deleteApprover',
       method: 'POST',
       headers: {
@@ -1657,8 +1877,8 @@ app.post('/api/getFileUrl', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/api/getFileUrl',
       method: 'POST',
       headers: {
@@ -1742,8 +1962,8 @@ app.post('/api/admin/initPassword', (req, res) => {
     console.log('외부 API 호출 페이로드:', payload);
 
     const options = {
-      hostname: 'ai2great.com',
-      port: 8060,
+      hostname: UPSTREAM_HOST,
+      port: UPSTREAM_PORT,
       path: '/admin/initPassword',
       method: 'POST',
       headers: {

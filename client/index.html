@@ -2424,7 +2424,7 @@
                 resultSpan.textContent = '조회 중...';
                 resultSpan.style.color = '#6c757d';
 
-                const response = await fetch('https://ai2great.com:8060/api/getUpdatePrivacyCount', {
+                const response = await fetch('/api/getUpdatePrivacyCount', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

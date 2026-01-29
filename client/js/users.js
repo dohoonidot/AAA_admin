@@ -1,7 +1,7 @@
 // 사용자 관리 기능
 
 // API URL 설정
-const USER_API_URL = 'https://ai2great.com:8060/admin';  // 생성/수정/삭제용
+const USER_API_URL = '/admin';  // 생성/수정/삭제용
 const API_BASE_URL = '/api';  // 조회용
 
 // 마지막 사용자 ID를 저장할 변수
