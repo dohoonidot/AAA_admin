@@ -3,6 +3,10 @@
 // 요청 상세 정보 캐시 (상세 모달용)
 const requestDetailCache = new Map();
 
+// 부여요청목록 페이지네이션 변수
+let currentRequestsPage = 1;
+let totalRequestsPages = 1;
+
 document.addEventListener('DOMContentLoaded', function() {
     try {
         // 페이지별 초기화 분기
@@ -554,10 +558,10 @@ function loadSampleData() {
 }
 
 // 휴가 요청 목록 로드
-async function loadVacationRequests() {
+async function loadVacationRequests(page = 1) {
     try {
-        console.log('휴가 부여 요청 목록 로드 시작');
-        
+        console.log('휴가 부여 요청 목록 로드 시작, 페이지:', page);
+
         // 현재 로그인한 사용자 ID 가져오기
         const userId = localStorage.getItem('userId') || localStorage.getItem('username');
         if (!userId) {
@@ -569,7 +573,7 @@ async function loadVacationRequests() {
         // 필터 값 가져오기
         const departmentFilter = document.getElementById('department-filter');
         const typeFilter = document.getElementById('type-filter');
-        
+
         const department = departmentFilter ? departmentFilter.value : '';
         const leaveType = typeFilter ? typeFilter.value : '';
 
@@ -591,8 +595,8 @@ async function loadVacationRequests() {
         // 로딩 상태 표시
         showLoadingState();
 
-        // API 호출 (서버 프록시 경유하여 CORS 회피)
-        const response = await fetch('/api/leave/grant/getRequestList', {
+        // API 호출 (서버 프록시 경유하여 CORS 회피) - 페이지네이션 파라미터 추가
+        const response = await fetch(`/api/leave/grant/getRequestList?page=${page}&page_size=10`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -609,21 +613,26 @@ async function loadVacationRequests() {
 
         // 데이터 렌더링
         renderVacationRequests(data.leave_grants || []);
-        
+
         // 통계 업데이트
         updateStatistics(data.leave_grants || []);
-        
+
         // 휴가 유형 필터 옵션 업데이트 (첫 로드 시)
         if (data.leave_grants && data.leave_grants.length > 0) {
             updateLeaveTypeFilterOptions(data.leave_grants);
         }
+
+        // 페이지네이션 정보 업데이트
+        totalRequestsPages = data.total_pages || 1;
+        currentRequestsPage = page;
+        updateRequestsPagination();
 
         console.log('휴가 부여 요청 목록 로드 완료');
 
     } catch (error) {
         console.error('휴가 요청 목록 로드 오류:', error);
         showToast('휴가 요청 목록을 불러오는데 실패했습니다.', 'error');
-        
+
         // 에러 상태 표시
         showErrorState();
     }
@@ -1714,6 +1723,143 @@ function goToFirstHistoryPage() {
 function goToLastHistoryPage() {
     if (currentHistoryPage < totalHistoryPages) {
         loadGrantHistory(totalHistoryPages);
+    }
+}
+
+// ==================== 부여요청목록 페이지네이션 ====================
+
+// 부여요청목록 페이지네이션 업데이트
+function updateRequestsPagination() {
+    const paginationContainer = document.getElementById('requests-pagination');
+    const pageInfo = document.getElementById('requests-page-info');
+    const pageNumbersContainer = document.getElementById('requests-page-numbers');
+    const firstBtn = document.getElementById('requests-first-page-btn');
+    const prevBtn = document.getElementById('requests-prev-page-btn');
+    const nextBtn = document.getElementById('requests-next-page-btn');
+    const lastBtn = document.getElementById('requests-last-page-btn');
+
+    if (!paginationContainer || !pageInfo) return;
+
+    if (totalRequestsPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+
+    paginationContainer.style.display = 'flex';
+    pageInfo.textContent = `${currentRequestsPage} / ${totalRequestsPages}`;
+
+    // 페이지 번호 버튼 생성
+    if (pageNumbersContainer) {
+        pageNumbersContainer.innerHTML = '';
+
+        const maxPageButtons = 7; // 최대 표시할 페이지 버튼 수
+        let startPage = Math.max(1, currentRequestsPage - Math.floor(maxPageButtons / 2));
+        let endPage = Math.min(totalRequestsPages, startPage + maxPageButtons - 1);
+
+        // endPage가 totalRequestsPages에 가까우면 startPage 조정
+        if (endPage - startPage < maxPageButtons - 1) {
+            startPage = Math.max(1, endPage - maxPageButtons + 1);
+        }
+
+        // 페이지 이동 함수
+        const goToPage = (pageNum) => {
+            loadVacationRequests(pageNum);
+        };
+
+        // 처음 페이지가 1이 아니면 1번과 "..." 표시
+        if (startPage > 1) {
+            const firstPageBtn = document.createElement('button');
+            firstPageBtn.className = 'pagination-page-btn';
+            firstPageBtn.textContent = '1';
+            firstPageBtn.onclick = () => goToPage(1);
+            pageNumbersContainer.appendChild(firstPageBtn);
+
+            if (startPage > 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                ellipsis.style.pointerEvents = 'none';
+                ellipsis.style.padding = '0 4px';
+                ellipsis.style.color = '#6c757d';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+        }
+
+        // 페이지 번호 버튼들 생성
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `pagination-page-btn ${i === currentRequestsPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.onclick = () => goToPage(i);
+            pageNumbersContainer.appendChild(pageBtn);
+        }
+
+        // 마지막 페이지가 endPage가 아니면 "..."과 마지막 페이지 표시
+        if (endPage < totalRequestsPages) {
+            if (endPage < totalRequestsPages - 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                ellipsis.style.pointerEvents = 'none';
+                ellipsis.style.padding = '0 4px';
+                ellipsis.style.color = '#6c757d';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+
+            const lastPageBtn = document.createElement('button');
+            lastPageBtn.className = 'pagination-page-btn';
+            lastPageBtn.textContent = totalRequestsPages;
+            lastPageBtn.onclick = () => goToPage(totalRequestsPages);
+            pageNumbersContainer.appendChild(lastPageBtn);
+        }
+    }
+
+    // 처음/이전/다음/마지막 버튼 활성화/비활성화
+    if (firstBtn) {
+        firstBtn.disabled = currentRequestsPage <= 1;
+        firstBtn.style.opacity = currentRequestsPage <= 1 ? '0.5' : '1';
+        firstBtn.style.cursor = currentRequestsPage <= 1 ? 'not-allowed' : 'pointer';
+    }
+
+    if (prevBtn) {
+        prevBtn.disabled = currentRequestsPage <= 1;
+        prevBtn.style.opacity = currentRequestsPage <= 1 ? '0.5' : '1';
+        prevBtn.style.cursor = currentRequestsPage <= 1 ? 'not-allowed' : 'pointer';
+    }
+
+    if (nextBtn) {
+        nextBtn.disabled = currentRequestsPage >= totalRequestsPages;
+        nextBtn.style.opacity = currentRequestsPage >= totalRequestsPages ? '0.5' : '1';
+        nextBtn.style.cursor = currentRequestsPage >= totalRequestsPages ? 'not-allowed' : 'pointer';
+    }
+
+    if (lastBtn) {
+        lastBtn.disabled = currentRequestsPage >= totalRequestsPages;
+        lastBtn.style.opacity = currentRequestsPage >= totalRequestsPages ? '0.5' : '1';
+        lastBtn.style.cursor = currentRequestsPage >= totalRequestsPages ? 'not-allowed' : 'pointer';
+    }
+}
+
+// 부여요청목록 페이지 변경
+function changeRequestsPage(direction) {
+    const newPage = currentRequestsPage + direction;
+    if (newPage < 1 || newPage > totalRequestsPages) {
+        return;
+    }
+    loadVacationRequests(newPage);
+}
+
+// 부여요청목록 처음 페이지로 이동
+function goToFirstRequestsPage() {
+    if (currentRequestsPage > 1) {
+        loadVacationRequests(1);
+    }
+}
+
+// 부여요청목록 마지막 페이지로 이동
+function goToLastRequestsPage() {
+    if (currentRequestsPage < totalRequestsPages) {
+        loadVacationRequests(totalRequestsPages);
     }
 }
 

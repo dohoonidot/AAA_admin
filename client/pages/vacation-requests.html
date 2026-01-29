@@ -106,6 +106,21 @@
                 <div class="requests-container">
                     <!-- 휴가 요청 카드들이 동적으로 생성됩니다 -->
                 </div>
+
+                <!-- 페이지네이션 -->
+                <div class="pagination-container" id="requests-pagination" style="display: none;">
+                    <button id="requests-first-page-btn" class="pagination-btn" onclick="goToFirstRequestsPage()">« 처음</button>
+                    <button id="requests-prev-page-btn" class="pagination-btn" onclick="changeRequestsPage(-1)">‹ 이전</button>
+
+                    <!-- 페이지 번호 버튼들 -->
+                    <div id="requests-page-numbers" style="display: flex; gap: 4px; align-items: center;"></div>
+
+                    <button id="requests-next-page-btn" class="pagination-btn" onclick="changeRequestsPage(1)">다음 ›</button>
+                    <button id="requests-last-page-btn" class="pagination-btn" onclick="goToLastRequestsPage()">마지막 »</button>
+
+                    <!-- 페이지 정보 -->
+                    <span id="requests-page-info" class="page-info">1 / 1</span>
+                </div>
             </div>
         </div>
     </div>

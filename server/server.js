@@ -581,12 +581,17 @@ app.post('/api/leave/grant/getRequestList', (req, res) => {
   try {
     console.log('=== 휴가 요청 목록 조회 API 요청 ===');
     console.log('요청 본문:', req.body);
-    
+    console.log('쿼리 파라미터:', req.query);
+
     const { user_id, department, leave_type } = req.body || {};
     if (!user_id) {
       console.log('필수 파라미터 누락: user_id');
       return res.status(400).json({ status_code: 400, error: 'user_id is required' });
     }
+
+    // 페이지네이션 파라미터
+    const page = req.query.page || 1;
+    const pageSize = req.query.page_size || 10;
 
     // 요청 페이로드 구성
     const requestPayload = { user_id };
@@ -603,7 +608,7 @@ app.post('/api/leave/grant/getRequestList', (req, res) => {
     const options = {
       hostname: UPSTREAM_HOST,
       port: UPSTREAM_PORT,
-      path: '/leave/grant/getRequestList',
+      path: `/leave/grant/getRequestList?page=${page}&page_size=${pageSize}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
