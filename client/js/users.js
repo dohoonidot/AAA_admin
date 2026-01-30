@@ -45,6 +45,51 @@ let activeFilters = {
     adminRole: ''
 };
 
+// 부서 목록 캐시
+let departmentListCache = [];
+
+// 부서 목록 API 호출 함수
+async function loadDepartmentList() {
+    try {
+        console.log('부서 목록 API 호출 시작');
+        const response = await fetch('/api/getDepartmentList');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('부서 목록 API 응답:', data);
+        
+        if (data.departments && Array.isArray(data.departments)) {
+            departmentListCache = data.departments;
+            updateDepartmentDropdown(data.departments);
+        }
+    } catch (error) {
+        console.error('부서 목록 로드 실패:', error);
+        // API 실패 시 기존 테이블 데이터에서 부서 추출하는 폴백
+    }
+}
+
+// 부서 드롭다운 업데이트 함수
+function updateDepartmentDropdown(departments) {
+    const departmentFilter = document.getElementById('department-filter');
+    if (!departmentFilter) return;
+    
+    // 기존 옵션 제거 (전체 부서 제외)
+    departmentFilter.innerHTML = '<option value="all">전체 부서</option>';
+    
+    // 부서 목록 추가
+    departments.forEach(dept => {
+        const option = document.createElement('option');
+        option.value = dept;
+        option.textContent = dept;
+        departmentFilter.appendChild(option);
+    });
+    
+    console.log('부서 드롭다운 업데이트 완료:', departments.length + '개');
+}
+
 // 관리권한 설명 매핑
 const adminRoleDescriptions = {
     '0': '최고관리자 - 모든 데이터 조회 가능, 모든 기능 사용 가능, user 권한 부여 가능, 휴가 총괄 관리 화면 접근 가능',
@@ -1023,6 +1068,9 @@ document.addEventListener('DOMContentLoaded', () => {
             addButton.title = '사용자 추가 권한이 없습니다.';
         }
     }
+
+    // 부서 목록 API 호출 (페이지 로드 시)
+    loadDepartmentList();
 
     // URL에서 현재 페이지, 필터 상태, 검색어를 가져오기
     const urlParams = new URLSearchParams(window.location.search);
